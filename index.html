@@ -16,14 +16,14 @@
 :root{
   --mist:#EEF3F9; --paper:#FFFDF9;
   --royal:#145AAE; --royal-deep:#0A3C82; --royal-ink:#123A6B;
-  --powder:#9DB9D8;
-  --gold:#BF9450; --gold-soft:#E0C48E;
+  --gold:#BF9450; --gold-dark:#A27A3C; --gold-soft:#E0C48E;
   --ink-soft:#4A6283;
   --serif:"Cormorant Garamond", Georgia, serif;
   --script:"Sacramento", cursive;
-  --env-w:min(420px, 88vw);
-  /* floral patterns are generated in the script below */
-  --fl-liner:none; --fl-env:none; --fl-gold:none;
+  --env-w:min(420px, 86vw);
+  /* leaf patterns and sprigs are generated in the script below */
+  --lf-front:none; --lf-back:none; --lf-liner:none; --lf-gold:none;
+  --sprig-white:none; --sprig-gold:none;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -35,165 +35,216 @@ body{
 }
 body.intro-active{overflow:hidden}
 
-/* ══════════════════ INTRO / ENVELOPE ══════════════════ */
+/* ══════════════════ INTRO ══════════════════ */
 .intro{
   position:fixed; inset:0; z-index:100;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  background:radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, var(--mist) 65%, #DFE8F3 100%);
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(ellipse at 50% 45%, #FFFFFF 0%, var(--mist) 65%, #DFE8F3 100%);
   cursor:pointer; overflow:hidden;
   transition:opacity .9s ease .5s, visibility 0s linear 1.4s;
 }
 .intro.is-gone{opacity:0; visibility:hidden}
+/* hold the envelope back until the script font has loaded, so the names never flash in a fallback font */
+.scene{opacity:0; transition:opacity .5s ease}
+.intro.is-ready .scene{opacity:1}
 
 .greeting{
+  position:absolute; top:max(7vh, 24px); left:16px; right:16px;
   font-style:italic; font-size:clamp(1.05rem, 3.6vw, 1.3rem); color:var(--ink-soft);
-  text-align:center; margin-bottom:calc(var(--env-w) * .46);
+  text-align:center;
   opacity:0; transform:translateY(8px);
   transition:opacity .8s ease, transform .8s ease;
 }
 .greeting strong{font-weight:600; font-style:normal; color:var(--royal-ink)}
 .intro.is-ready .greeting{opacity:1; transform:none}
+.intro.is-rising .greeting{opacity:0}
 
-.envelope{
-  position:relative; width:var(--env-w); height:calc(var(--env-w) * .66);
-  perspective:1400px;
-  transition:transform 1s cubic-bezier(.5,0,.7,.4), opacity .8s ease;
+.hint{
+  position:absolute; bottom:max(7vh, 24px); left:50%; transform:translateX(-50%);
+  font-size:.82rem; letter-spacing:.32em; text-transform:uppercase; color:var(--ink-soft);
+  background:none; border:0; font-family:inherit; cursor:pointer; white-space:nowrap;
+  padding:.6em 1em;
+  opacity:0; transition:opacity .8s ease;
 }
-.royal-paper{
+.hint:focus-visible{outline:1px solid var(--gold); outline-offset:4px}
+.intro.is-card .hint{opacity:1; animation:pulse 2.4s ease-in-out 1s infinite}
+@keyframes pulse{50%{opacity:.4}}
+
+/* the envelope lives in .scene; front and back are two views swapped mid-turn */
+.scene{
+  position:relative; width:var(--env-w); height:calc(var(--env-w) * .66);
+  margin-top:calc(var(--env-w) * .3);
+  perspective:1600px;
+}
+.view{position:absolute; inset:0; transition:transform .45s}
+
+.royal{
   background:
-    var(--fl-env) 0 0 / 150px,
-    var(--fl-env) 75px 75px / 150px,
+    var(--lf-back) 0 0 / 200px,
+    var(--lf-back) 100px 100px / 200px,
     linear-gradient(160deg, #1D66B9, var(--royal) 45%, var(--royal-deep));
 }
 .liner{
   background:
-    var(--fl-liner) 0 0 / 110px,
-    var(--fl-liner) 55px 55px / 110px,
+    var(--lf-liner) 0 0 / 150px,
+    var(--lf-liner) 75px 75px / 150px,
     #FFFFFF;
 }
+.script-names{
+  font-family:var(--script); color:#fff; text-align:center; line-height:.78;
+  text-shadow:0 1px 6px rgba(0,0,0,.18);
+}
+.script-names small{display:block; font-size:.5em; line-height:1.15}
 
-.env-back{
+/* — front of the envelope (closed, shown on load) — */
+.view.front{
+  border-radius:4px; display:grid; place-items:center;
+  background:
+    var(--lf-front) 0 0 / 220px,
+    var(--lf-front) 110px 110px / 220px,
+    linear-gradient(160deg, #1A62B5, var(--royal) 50%, var(--royal-deep));
+  box-shadow:0 22px 44px -14px rgba(10,60,130,.5), 0 4px 10px rgba(10,60,130,.18);
+  transition-timing-function:cubic-bezier(.55,0,1,.45);
+}
+.view.front .script-names{font-size:calc(var(--env-w) * .15)}
+.intro.is-turning .view.front{transform:rotateY(90deg)}
+
+/* — back of the envelope (flap side) — */
+.view.back{
+  perspective:1400px;
+  transform:rotateY(-90deg);
+  transition-timing-function:cubic-bezier(0,.55,.45,1);
+}
+.intro.is-turned .view.back{transform:none}
+
+.env-shell{
   position:absolute; inset:0; border-radius:4px;
   box-shadow:0 22px 44px -14px rgba(10,60,130,.5), 0 4px 10px rgba(10,60,130,.18);
 }
-.env-back .liner{position:absolute; left:5%; right:5%; top:5%; bottom:30%}
+.env-shell .liner{position:absolute; left:4.5%; right:4.5%; top:5%; bottom:30%; border-radius:2px}
 
-/* the card */
+.env-front{
+  position:absolute; inset:0; z-index:3; border-radius:4px; overflow:hidden;
+  pointer-events:none;
+}
+.env-front .sides, .env-front .bottom{position:absolute; inset:0}
+.env-front .sides{clip-path:polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%)}
+.env-front .sides::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 30% 70%, rgba(0,0,0,.14));
+}
+.env-front .bottom{
+  clip-path:polygon(0 100%, 0 99%, 50% 48%, 100% 99%, 100% 100%);
+  filter:brightness(1.07);
+}
+.env-front .script-names{
+  position:absolute; left:0; right:0; bottom:7%;
+  font-size:calc(var(--env-w) * .1);
+}
+
+/* top flap — shape comes from the SVG clip paths in the page */
+.flap, .flap-shadow{position:absolute; left:0; right:0; top:0; height:62%}
+.flap{
+  z-index:5; transform-origin:top center; transform-style:preserve-3d;
+  transition:transform 1s cubic-bezier(.45,.05,.3,1), z-index 0s linear .5s;
+}
+.flap-shadow{
+  z-index:4; transform:translateY(3px);
+  -webkit-clip-path:url(#flapClip); clip-path:url(#flapClip);
+  background:rgba(4,30,70,.45);
+  transition:opacity .3s ease;
+}
+.flap-face{position:absolute; inset:0; backface-visibility:hidden}
+.flap-face.outside{-webkit-clip-path:url(#flapClip); clip-path:url(#flapClip)}
+.flap-face.outside::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.18));
+}
+.flap-face.open{ /* what shows once the flap stands up: blue with a white sprig */
+  transform:rotateX(180deg);
+  -webkit-clip-path:url(#flapClipOpen); clip-path:url(#flapClipOpen);
+}
+.flap-face.open::after{
+  content:""; position:absolute; left:50%; top:6%; width:22%; height:62%;
+  transform:translateX(-50%);
+  background:var(--sprig-white) center / contain no-repeat;
+}
+.intro.is-open .flap{transform:rotateX(180deg); z-index:1}
+.intro.is-open .flap-shadow{opacity:0}
+
+/* — the card — */
 .card{
-  position:absolute; left:6%; right:6%; bottom:4%; height:92%;
-  z-index:2; border-radius:3px; overflow:hidden;
-  background:var(--paper);
+  position:absolute; left:6%; right:6%; bottom:5%; height:88%;
+  z-index:2; transform-style:preserve-3d;
+  transition:transform 1.1s cubic-bezier(.3,.7,.3,1);
+}
+.intro.is-lifted .card{z-index:10}
+.intro.is-card .card{transition:transform 1.3s cubic-bezier(.6,0,.25,1)}
+.card-face{
+  position:absolute; inset:0; border-radius:3px; overflow:hidden;
+  background:var(--paper); backface-visibility:hidden;
   box-shadow:0 2px 10px rgba(10,60,130,.2);
-  transition:transform 1.3s cubic-bezier(.22,.9,.25,1);
 }
-.card::before{ /* thin gold frame */
-  content:""; position:absolute; inset:7px; border:1px solid var(--gold-soft); border-radius:2px;
-  pointer-events:none; z-index:1;
+.intro.is-card .card-face{box-shadow:0 24px 50px -18px rgba(10,60,130,.45), 0 2px 8px rgba(10,60,130,.12)}
+.card-face::before{ /* thin gold frame */
+  content:""; position:absolute; inset:6px; border:1px solid var(--gold-soft); border-radius:2px;
+  pointer-events:none; z-index:2;
 }
-.card::after{ /* gold florals along the bottom, as on the reference card */
-  content:""; position:absolute; left:0; right:0; bottom:0; height:38%;
-  background:var(--fl-gold) 0 100% / 120px repeat-x, var(--fl-gold) 60px 70% / 120px repeat-x;
-  -webkit-mask-image:linear-gradient(to top, #000 30%, transparent);
-          mask-image:linear-gradient(to top, #000 30%, transparent);
+.card-face.back{display:grid; place-items:center}
+.card-face.back::after{
+  content:""; position:absolute; left:50%; top:50%; width:16%; height:72%;
+  transform:translate(-50%,-50%) rotate(90deg);
+  background:var(--sprig-gold) center / contain no-repeat; opacity:.55;
 }
+.card-face.back span{
+  position:relative; z-index:1;
+  font-family:var(--script); color:var(--gold); font-size:calc(var(--env-w) * .11);
+  background:var(--paper); padding:0 .25em; border-radius:50%;
+}
+.card-face.inside{transform:rotateY(180deg)}
+.sprig{position:absolute; width:20%; height:62%; background:var(--sprig-gold) center / contain no-repeat}
+.sprig.tr{right:3%; top:-4%; transform:rotate(-140deg)}
+.sprig.bl{left:3%; bottom:-4%; transform:rotate(40deg)}
 .card-inner{
-  position:relative; z-index:2; height:100%;
-  display:flex; flex-direction:column; align-items:center;
-  padding-top:calc(var(--env-w) * .045);
-  text-align:center;
+  position:relative; z-index:1; height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:0 12%;
+}
+.eyebrow-sm{
+  font-size:calc(var(--env-w) * .024); letter-spacing:.28em; text-transform:uppercase; color:var(--gold-dark);
 }
 .photo{
-  position:relative; width:calc(var(--env-w) * .17); aspect-ratio:1;
-  border-radius:50%; overflow:hidden;
+  position:relative; width:calc(var(--env-w) * .13); aspect-ratio:1;
+  border-radius:50%; overflow:hidden; margin:calc(var(--env-w) * .02) 0;
   border:2px solid var(--gold-soft);
   box-shadow:0 0 0 3px var(--paper), 0 0 0 4px var(--gold-soft);
   background:var(--royal);
   display:grid; place-items:center;
 }
 .photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-.photo .mono{font-family:var(--script); color:#fff; font-size:calc(var(--env-w) * .075)}
+.photo .mono{font-family:var(--script); color:#fff; font-size:calc(var(--env-w) * .06)}
 .card h1{
   font-family:var(--script); font-weight:400; color:var(--gold);
-  font-size:calc(var(--env-w) * .1); line-height:1.05;
-  margin-top:calc(var(--env-w) * .015);
+  font-size:calc(var(--env-w) * .085); line-height:1.05;
 }
 .card .names{
-  font-size:calc(var(--env-w) * .033); letter-spacing:.3em; text-transform:uppercase;
-  color:var(--royal-ink);
+  margin-top:calc(var(--env-w) * .012);
+  font-size:calc(var(--env-w) * .03); letter-spacing:.3em; text-transform:uppercase; color:var(--royal-ink);
 }
 
-/* front pocket (side + bottom flaps) */
-.env-front{
-  position:absolute; inset:0; z-index:3; border-radius:4px; overflow:hidden;
-  pointer-events:none;
+/* envelope drops away once the card is out */
+.intro.is-card .env-shell,
+.intro.is-card .env-front,
+.intro.is-card .flap{
+  transform:translateY(70vh); opacity:0;
+  transition:transform 1s cubic-bezier(.5,0,.75,0), opacity .9s ease;
 }
-.env-front .sides, .env-front .bottom{position:absolute; inset:0}
-.env-front .sides{clip-path:polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%)}
-.env-front .sides::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 30% 70%, rgba(0,0,0,.14));
-}
-.env-front .bottom{
-  clip-path:polygon(0 100%, 0 99%, 50% 46%, 100% 99%, 100% 100%);
-  filter:brightness(1.07);
-}
-.env-names{
-  position:absolute; left:0; right:0; bottom:6%;
-  font-family:var(--script); color:#fff; text-align:center; line-height:.78;
-  font-size:calc(var(--env-w) * .11);
-  text-shadow:0 1px 6px rgba(0,0,0,.18);
-}
-.env-names small{display:block; font-size:.55em; line-height:1.1}
+.intro.is-card .flap{transform:translateY(70vh) rotateX(180deg)}
 
-/* top flap — shape comes from the SVG clip paths at the bottom of the page */
-.flap{
-  position:absolute; left:0; right:0; top:0; height:60%;
-  z-index:5; transform-origin:top center; transform-style:preserve-3d;
-  transition:transform 1s cubic-bezier(.45,.05,.3,1), z-index 0s linear .5s;
-}
-.flap-face{position:absolute; inset:0; backface-visibility:hidden}
-.flap-face.front{-webkit-clip-path:url(#flapClip); clip-path:url(#flapClip)}
-.flap-face.front::after{ /* soft fold shading near the tip */
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.18));
-}
-.flap-face.back{
-  transform:rotateX(180deg);
-  -webkit-clip-path:url(#flapClipBack); clip-path:url(#flapClipBack);
-  background:var(--royal-deep);
-}
-.flap-face.back .liner{
-  position:absolute; inset:0;
-  -webkit-clip-path:url(#flapLinerBack); clip-path:url(#flapLinerBack);
-}
-
-.flap-shadow{ /* soft shadow under the closed flap so its edge reads */
-  position:absolute; left:0; right:0; top:0; height:60%; z-index:4;
-  -webkit-clip-path:url(#flapClip); clip-path:url(#flapClip);
-  background:rgba(4,30,70,.45); transform:translateY(3px);
-  transition:opacity .3s ease;
-}
-.intro.is-open .flap-shadow{opacity:0}
-
-.hint{
-  margin-top:calc(var(--env-w) * .12);
-  font-size:.82rem; letter-spacing:.32em; text-transform:uppercase; color:var(--ink-soft);
-  background:none; border:0; font-family:inherit; cursor:pointer;
-  padding:.6em 1em;
-  opacity:0; transition:opacity .8s ease;
-}
-.hint:focus-visible{outline:1px solid var(--gold); outline-offset:4px}
-
-/* sequence states */
-.intro.is-open .flap{transform:rotateX(180deg); z-index:1}
-.intro.is-out  .card{transform:translateY(-62%)}
-.intro.is-out  .hint{opacity:1; animation:pulse 2.4s ease-in-out 1s infinite}
-.intro.is-leaving .card{transform:translateY(-135%)}
-.intro.is-leaving .envelope{transform:translateY(60vh); opacity:0}
-.intro.is-leaving .greeting,
+/* fade the faces, not the card: opacity on the card itself would flatten its 3D flip */
+.intro.is-leaving .card{transition:transform .8s ease}
+.intro.is-leaving .card-face{opacity:0; transition:opacity .7s ease}
 .intro.is-leaving .hint{opacity:0; animation:none}
-
-@keyframes pulse{50%{opacity:.4}}
 
 /* ══════════════════ MAIN / FIRST PAGE ══════════════════ */
 .hero{
@@ -203,14 +254,13 @@ body.intro-active{overflow:hidden}
   padding:48px 16px; text-align:center;
   background:radial-gradient(ellipse at 50% 35%, #FFFFFF 0%, var(--mist) 75%);
 }
-.hero::after{ /* gold florals along the bottom edge */
-  content:""; position:absolute; left:0; right:0; bottom:0; height:180px; pointer-events:none;
-  background:var(--fl-gold) 0 100% / 160px repeat-x, var(--fl-gold) 80px 60% / 160px repeat-x;
-  -webkit-mask-image:linear-gradient(to top, #000 20%, transparent);
-          mask-image:linear-gradient(to top, #000 20%, transparent);
-  opacity:.7;
+.hero::before, .hero::after{ /* gold sprigs in the corners */
+  content:""; position:absolute; width:min(150px, 32vw); height:min(380px, 60vh); pointer-events:none;
+  background:var(--sprig-gold) center / contain no-repeat; opacity:.8;
 }
-.hero .eyebrow{font-size:.85rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold)}
+.hero::before{right:2%; top:-6%; transform:rotate(-150deg)}
+.hero::after{left:2%; bottom:-6%; transform:rotate(30deg)}
+.hero .eyebrow{font-size:.85rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-dark)}
 .hero h2{
   font-family:var(--script); font-weight:400; line-height:1; color:var(--royal);
   font-size:clamp(4rem, 16vw, 8rem); margin:.2em 0 .1em;
@@ -232,52 +282,64 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 </style>
 
 <script>
-// Draws the floral motif once and exposes it in three colours as CSS variables.
+// Draws leafy branches once and exposes them as CSS variables in each colour used.
 (function(){
-  function flower(cx, cy, r){
-    var s = '';
-    for (var i = 0; i < 8; i++)
-      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .55) + "' rx='" + r * .36 + "' ry='" + r * .62 +
-           "' fill-opacity='.45' transform='rotate(" + i * 45 + " " + cx + " " + cy + ")'/>";
-    for (var j = 0; j < 6; j++)
-      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .32) + "' rx='" + r * .2 + "' ry='" + r * .38 +
-           "' fill-opacity='.75' transform='rotate(" + (j * 60 + 20) + " " + cx + " " + cy + ")'/>";
-    return s + "<circle cx='" + cx + "' cy='" + cy + "' r='" + r * .16 + "'/>";
+  function leaf(x, y, deg, L, line, color){
+    var w = L * .2;
+    var d = 'M0 0C' + L*.3 + ' ' + -w + ' ' + L*.7 + ' ' + -w + ' ' + L + ' 0C' + L*.7 + ' ' + w + ' ' + L*.3 + ' ' + w + ' 0 0Z';
+    var t = "transform='translate(" + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + deg.toFixed(1) + ")'";
+    return line
+      ? "<g " + t + " fill='none' stroke='" + color + "' stroke-width='1'><path d='" + d + "'/><path d='M0 0L" + L*.85 + " 0'/></g>"
+      : "<path " + t + " d='" + d + "' fill='" + color + "'/>";
   }
-  function leaf(x, y, rot, sc){
-    return "<path d='M0 0C7 -11 20 -13 30 -6C20 1 9 5 0 0Z' fill-opacity='.7' transform='translate(" +
-           x + " " + y + ") rotate(" + rot + ") scale(" + (sc || 1) + ")'/>";
+  // stem from (x0,y0) to (x1,y1) bowing by `bend`, with n alternating leaves and one at the tip
+  function branch(x0, y0, x1, y1, bend, n, L, line, color){
+    var mx = (x0 + x1) / 2, my = (y0 + y1) / 2, len = Math.hypot(x1 - x0, y1 - y0);
+    var cx = mx - (y1 - y0) / len * bend, cy = my + (x1 - x0) / len * bend;
+    var s = "<path d='M" + x0 + ' ' + y0 + 'Q' + cx + ' ' + cy + ' ' + x1 + ' ' + y1 +
+            "' fill='none' stroke='" + color + "' stroke-width='" + (line ? 1 : 1.4) + "'/>";
+    for (var i = 1; i <= n + 1; i++){
+      var t = i === n + 1 ? 1 : .12 + (i - 1) / n * .82, u = 1 - t;
+      var px = u*u*x0 + 2*u*t*cx + t*t*x1, py = u*u*y0 + 2*u*t*cy + t*t*y1;
+      var dx = 2*u*(cx - x0) + 2*t*(x1 - cx), dy = 2*u*(cy - y0) + 2*t*(y1 - cy);
+      var a = Math.atan2(dy, dx) * 180 / Math.PI;
+      var tip = i === n + 1;
+      s += leaf(px, py, tip ? a : a + (i % 2 ? 42 : -42), L * (tip ? .8 : 1 - t * .4), line, color);
+    }
+    return s;
   }
-  function motif(color){
-    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>" +
-      "<g fill='" + color + "' stroke='none'>" +
-      "<path d='M52 58C80 70 96 96 122 122M52 58C32 80 26 102 18 134M122 122C142 100 150 62 140 28' fill='none' stroke='" + color + "' stroke-width='1.6' stroke-opacity='.7'/>" +
-      flower(52, 58, 26) + flower(122, 122, 15) +
-      leaf(84, 76, -30) + leaf(100, 96, 40, .8) + leaf(28, 98, 150) + leaf(22, 122, 210, .8) +
-      leaf(144, 62, -70, .9) + leaf(140, 30, -120, .7) + leaf(10, 20, 30, .8) +
-      "</g></svg>";
+  function uri(w, h, body){
+    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h + "' viewBox='0 0 " + w + ' ' + h + "'>" + body + '</svg>';
     return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
   }
+  function pattern(color, line){
+    return uri(200, 200,
+      branch(10, 190, 150, 40, 24, 7, 34, line, color) +
+      branch(195, 150, 120, 195, -10, 3, 26, line, color) +
+      branch(30, 10, 95, 60, -10, 3, 22, line, color));
+  }
+  function sprig(color){
+    return uri(80, 220, branch(40, 215, 44, 10, 10, 8, 42, true, color));
+  }
   var root = document.documentElement.style;
-  root.setProperty('--fl-liner', motif('#8FB0D4'));
-  root.setProperty('--fl-env', motif('rgba(150,195,245,.24)'));
-  root.setProperty('--fl-gold', motif('#D7B472'));
+  root.setProperty('--lf-front', pattern('rgba(4,32,84,.35)'));
+  root.setProperty('--lf-back', pattern('rgba(150,195,245,.22)'));
+  root.setProperty('--lf-liner', pattern('rgba(120,160,208,.75)'));
+  root.setProperty('--sprig-white', sprig('#FFFFFF'));
+  root.setProperty('--sprig-gold', sprig('#C29A57'));
 })();
 </script>
 </head>
 <body class="intro-active">
 
-<!-- Flap shapes (rounded tip). The back face is drawn flipped because it is rotated with the flap. -->
+<!-- Flap shapes (rounded tip). The open face is drawn flipped because it turns over with the flap. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <clipPath id="flapClip" clipPathUnits="objectBoundingBox">
-      <path d="M0,0 L1,0 L0.6,0.86 Q0.5,1.02 0.4,0.86 Z"/>
+      <path d="M0,0 L1,0 L0.64,0.8 Q0.5,1.06 0.36,0.8 Z"/>
     </clipPath>
-    <clipPath id="flapClipBack" clipPathUnits="objectBoundingBox">
-      <path d="M0,1 L1,1 L0.6,0.14 Q0.5,-0.02 0.4,0.14 Z"/>
-    </clipPath>
-    <clipPath id="flapLinerBack" clipPathUnits="objectBoundingBox">
-      <path d="M0.055,1 L0.945,1 L0.585,0.22 Q0.5,0.07 0.415,0.22 Z"/>
+    <clipPath id="flapClipOpen" clipPathUnits="objectBoundingBox">
+      <path d="M0,1 L1,1 L0.64,0.2 Q0.5,-0.06 0.36,0.2 Z"/>
     </clipPath>
   </defs>
 </svg>
@@ -286,28 +348,43 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 <div class="intro" id="intro" aria-label="Your invitation">
   <p class="greeting" id="greeting">You've got mail</p>
 
-  <div class="envelope" aria-hidden="true">
-    <div class="env-back royal-paper"><div class="liner"></div></div>
-    <div class="card">
-      <div class="card-inner">
-        <div class="photo">
-          <span class="mono">J&amp;J</span>
-          <!-- Drop the couple's photo at photos/couple.jpg; the monogram shows until then -->
-          <img src="photos/couple.jpg" alt="" onerror="this.remove()">
+  <div class="scene" aria-hidden="true">
+    <!-- envelope front: what the guest sees first -->
+    <div class="view front">
+      <p class="script-names">John<small>and</small>Jess</p>
+    </div>
+
+    <!-- envelope back: flap opens and the card comes out -->
+    <div class="view back">
+      <div class="env-shell royal"><div class="liner"></div></div>
+
+      <div class="card" id="card">
+        <div class="card-face back"><span>J&amp;J</span></div>
+        <div class="card-face inside">
+          <i class="sprig tr"></i><i class="sprig bl"></i>
+          <div class="card-inner">
+            <p class="eyebrow-sm">Together with their families</p>
+            <div class="photo">
+              <span class="mono">J&amp;J</span>
+              <!-- Drop the couple's photo at photos/couple.jpg; the monogram shows until then -->
+              <img src="photos/couple.jpg" alt="" onerror="this.remove()">
+            </div>
+            <h1>We&rsquo;re getting married!</h1>
+            <p class="names">John &amp; Jess</p>
+          </div>
         </div>
-        <h1>We&rsquo;re getting married!</h1>
-        <p class="names">John &amp; Jess</p>
       </div>
-    </div>
-    <div class="env-front">
-      <div class="sides royal-paper"></div>
-      <div class="bottom royal-paper"></div>
-      <p class="env-names">John<small>and</small>Jess</p>
-    </div>
-    <div class="flap-shadow"></div>
-    <div class="flap">
-      <div class="flap-face front royal-paper"></div>
-      <div class="flap-face back"><div class="liner"></div></div>
+
+      <div class="env-front">
+        <div class="sides royal"></div>
+        <div class="bottom royal"></div>
+        <p class="script-names">John<small>and</small>Jess</p>
+      </div>
+      <div class="flap-shadow"></div>
+      <div class="flap">
+        <div class="flap-face outside royal"></div>
+        <div class="flap-face open royal"></div>
+      </div>
     </div>
   </div>
 
@@ -328,6 +405,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 <script>
 (function(){
   var intro = document.getElementById('intro');
+  var card = document.getElementById('card');
   var btn = document.getElementById('continue');
 
   // Personalise with ?to=Name (e.g. ?to=Aunt%20Mary)
@@ -342,21 +420,54 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 
   if ('ontouchstart' in window) btn.textContent = 'Tap to continue';
 
-  // Auto sequence: closed envelope → flap opens → card slides partly out
-  setTimeout(function(){ intro.classList.add('is-ready'); }, 200);
-  setTimeout(function(){ intro.classList.add('is-open'); }, 1100);
-  setTimeout(function(){ intro.classList.add('is-out'); }, 2000);
+  function at(ms, fn){ setTimeout(fn, ms); }
+  function add(c){ intro.classList.add(c); }
+
+  // Card lifts just clear of the envelope, then comes to the centre and flips face up.
+  function liftY(){ return -(card.offsetTop + card.offsetHeight) - 6; }
+  function finalTransform(shift){
+    var env = card.offsetParent.getBoundingClientRect();
+    var centre = env.top + card.offsetTop + card.offsetHeight / 2;
+    var scale = Math.min(1.3, (innerWidth - 32) / card.offsetWidth, innerHeight * .62 / card.offsetHeight);
+    return 'translateY(' + (innerHeight / 2 - centre - (shift || 0)) + 'px) rotateY(180deg) scale(' + scale.toFixed(3) + ')';
+  }
+
+  // Sequence: closed front (2s) → envelope turns over → flap opens → card rises → card flips
+  var started = false;
+  function start(){
+    if (started) return;
+    started = true;
+    add('is-ready');
+    at(2000, function(){ add('is-turning'); });
+    at(2450, function(){ add('is-turned'); });
+    at(3100, function(){ add('is-open'); });
+    at(3900, function(){ add('is-rising'); card.style.transform = 'translateY(' + liftY() + 'px)'; });
+    at(5000, function(){ add('is-lifted'); });
+    at(5100, function(){ add('is-card'); card.style.transform = finalTransform(); });
+  }
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('1em Sacramento').then(start, start);
+    at(1500, start); // don't wait forever on a slow connection
+  } else {
+    start();
+  }
+
+  addEventListener('resize', function(){
+    if (intro.classList.contains('is-card') && !intro.classList.contains('is-leaving'))
+      card.style.transform = finalTransform();
+  });
 
   var left = false;
   function enter(){
-    if (left || !intro.classList.contains('is-out')) return;
+    if (left || !intro.classList.contains('is-card')) return;
     left = true;
-    intro.classList.add('is-leaving');
+    card.style.transform = finalTransform(40);
+    add('is-leaving');
     setTimeout(function(){
-      intro.classList.add('is-gone');
+      add('is-gone');
       document.body.classList.remove('intro-active');
-    }, 700);
-    setTimeout(function(){ intro.remove(); }, 2300);
+    }, 500);
+    setTimeout(function(){ intro.remove(); }, 2100);
   }
   intro.addEventListener('click', enter);
 })();
