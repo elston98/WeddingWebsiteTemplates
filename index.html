@@ -5,29 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>John &amp; Jess — We're Getting Married</title>
 <meta name="description" content="John &amp; Jess are getting married. Open your invitation.">
-<meta name="theme-color" content="#EFE8DC">
+<meta name="theme-color" content="#EEF3F9">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Sacramento&display=swap">
 
 <style>
 /* ══════════════════ TOKENS ══════════════════ */
 :root{
-  --linen:#EFE8DC; --ivory:#FCF9F3;
-  --sage:#A9B79C; --sage-dark:#8E9E80; --sage-deep:#7A8B6C;
-  --ink:#2F3E2E; --ink-soft:#56634F;
-  --gold:#B08D57; --gold-soft:#D8C29A;
+  --mist:#EEF3F9; --paper:#FFFDF9;
+  --royal:#145AAE; --royal-deep:#0A3C82; --royal-ink:#123A6B;
+  --powder:#9DB9D8;
+  --gold:#BF9450; --gold-soft:#E0C48E;
+  --ink-soft:#4A6283;
   --serif:"Cormorant Garamond", Georgia, serif;
-  --script:"Pinyon Script", cursive;
+  --script:"Sacramento", cursive;
   --env-w:min(420px, 88vw);
+  /* floral patterns are generated in the script below */
+  --fl-liner:none; --fl-env:none; --fl-gold:none;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family:var(--serif); color:var(--ink);
-  background:var(--linen);
+  font-family:var(--serif); color:var(--royal-ink);
+  background:var(--mist);
   -webkit-font-smoothing:antialiased;
 }
 body.intro-active{overflow:hidden}
@@ -36,8 +39,7 @@ body.intro-active{overflow:hidden}
 .intro{
   position:fixed; inset:0; z-index:100;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  background:
-    radial-gradient(ellipse at 50% 40%, #F7F2E9 0%, var(--linen) 60%, #E4DACA 100%);
+  background:radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, var(--mist) 65%, #DFE8F3 100%);
   cursor:pointer; overflow:hidden;
   transition:opacity .9s ease .5s, visibility 0s linear 1.4s;
 }
@@ -45,38 +47,57 @@ body.intro-active{overflow:hidden}
 
 .greeting{
   font-style:italic; font-size:clamp(1.05rem, 3.6vw, 1.3rem); color:var(--ink-soft);
-  text-align:center; margin-bottom:calc(var(--env-w) * .42);
+  text-align:center; margin-bottom:calc(var(--env-w) * .46);
   opacity:0; transform:translateY(8px);
   transition:opacity .8s ease, transform .8s ease;
 }
-.greeting strong{font-weight:600; font-style:normal; color:var(--ink)}
+.greeting strong{font-weight:600; font-style:normal; color:var(--royal-ink)}
 .intro.is-ready .greeting{opacity:1; transform:none}
 
 .envelope{
   position:relative; width:var(--env-w); height:calc(var(--env-w) * .66);
-  perspective:1200px;
+  perspective:1400px;
   transition:transform 1s cubic-bezier(.5,0,.7,.4), opacity .8s ease;
 }
-.env-back{
-  position:absolute; inset:0; border-radius:6px;
-  background:linear-gradient(180deg, var(--sage-deep), var(--sage-dark));
-  box-shadow:0 18px 40px -12px rgba(47,62,46,.45), 0 4px 10px rgba(47,62,46,.15);
+.royal-paper{
+  background:
+    var(--fl-env) 0 0 / 150px,
+    var(--fl-env) 75px 75px / 150px,
+    linear-gradient(160deg, #1D66B9, var(--royal) 45%, var(--royal-deep));
 }
+.liner{
+  background:
+    var(--fl-liner) 0 0 / 110px,
+    var(--fl-liner) 55px 55px / 110px,
+    #FFFFFF;
+}
+
+.env-back{
+  position:absolute; inset:0; border-radius:4px;
+  box-shadow:0 22px 44px -14px rgba(10,60,130,.5), 0 4px 10px rgba(10,60,130,.18);
+}
+.env-back .liner{position:absolute; left:5%; right:5%; top:5%; bottom:30%}
 
 /* the card */
 .card{
-  position:absolute; left:5%; right:5%; bottom:4%; height:92%;
-  z-index:2; border-radius:4px;
-  background:var(--ivory);
-  box-shadow:0 2px 8px rgba(47,62,46,.18);
+  position:absolute; left:6%; right:6%; bottom:4%; height:92%;
+  z-index:2; border-radius:3px; overflow:hidden;
+  background:var(--paper);
+  box-shadow:0 2px 10px rgba(10,60,130,.2);
   transition:transform 1.3s cubic-bezier(.22,.9,.25,1);
 }
 .card::before{ /* thin gold frame */
   content:""; position:absolute; inset:7px; border:1px solid var(--gold-soft); border-radius:2px;
-  pointer-events:none;
+  pointer-events:none; z-index:1;
+}
+.card::after{ /* gold florals along the bottom, as on the reference card */
+  content:""; position:absolute; left:0; right:0; bottom:0; height:38%;
+  background:var(--fl-gold) 0 100% / 120px repeat-x, var(--fl-gold) 60px 70% / 120px repeat-x;
+  -webkit-mask-image:linear-gradient(to top, #000 30%, transparent);
+          mask-image:linear-gradient(to top, #000 30%, transparent);
 }
 .card-inner{
-  position:relative; height:100%;
+  position:relative; z-index:2; height:100%;
   display:flex; flex-direction:column; align-items:center;
   padding-top:calc(var(--env-w) * .045);
   text-align:center;
@@ -85,63 +106,74 @@ body.intro-active{overflow:hidden}
   position:relative; width:calc(var(--env-w) * .17); aspect-ratio:1;
   border-radius:50%; overflow:hidden;
   border:2px solid var(--gold-soft);
-  box-shadow:0 0 0 3px var(--ivory), 0 0 0 4px var(--gold-soft);
-  background:var(--sage);
+  box-shadow:0 0 0 3px var(--paper), 0 0 0 4px var(--gold-soft);
+  background:var(--royal);
   display:grid; place-items:center;
 }
 .photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-.photo .mono{font-family:var(--script); color:var(--ivory); font-size:calc(var(--env-w) * .06)}
+.photo .mono{font-family:var(--script); color:#fff; font-size:calc(var(--env-w) * .075)}
 .card h1{
-  font-family:var(--script); font-weight:400; color:var(--ink);
-  font-size:calc(var(--env-w) * .085); line-height:1.1;
-  margin-top:calc(var(--env-w) * .02);
+  font-family:var(--script); font-weight:400; color:var(--gold);
+  font-size:calc(var(--env-w) * .1); line-height:1.05;
+  margin-top:calc(var(--env-w) * .015);
 }
 .card .names{
-  font-size:calc(var(--env-w) * .036); letter-spacing:.3em; text-transform:uppercase;
-  color:var(--gold); margin-top:calc(var(--env-w) * .01);
+  font-size:calc(var(--env-w) * .033); letter-spacing:.3em; text-transform:uppercase;
+  color:var(--royal-ink);
 }
 
 /* front pocket (side + bottom flaps) */
 .env-front{
-  position:absolute; inset:0; z-index:3; border-radius:6px; overflow:hidden;
+  position:absolute; inset:0; z-index:3; border-radius:4px; overflow:hidden;
   pointer-events:none;
 }
-.env-front::before, .env-front::after{content:""; position:absolute; inset:0}
-.env-front::before{ /* side flaps */
-  background:linear-gradient(90deg, var(--sage-dark), var(--sage) 50%, var(--sage-dark));
-  clip-path:polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+.env-front .sides, .env-front .bottom{position:absolute; inset:0}
+.env-front .sides{clip-path:polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%)}
+.env-front .sides::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 30% 70%, rgba(0,0,0,.14));
 }
-.env-front::after{ /* bottom flap */
-  background:linear-gradient(0deg, var(--sage-dark), var(--sage));
-  clip-path:polygon(0 100%, 50% 44%, 100% 100%);
-  filter:drop-shadow(0 -1px 0 rgba(255,255,255,.25));
+.env-front .bottom{
+  clip-path:polygon(0 100%, 0 99%, 50% 46%, 100% 99%, 100% 100%);
+  filter:brightness(1.07);
+}
+.env-names{
+  position:absolute; left:0; right:0; bottom:6%;
+  font-family:var(--script); color:#fff; text-align:center; line-height:.78;
+  font-size:calc(var(--env-w) * .11);
+  text-shadow:0 1px 6px rgba(0,0,0,.18);
+}
+.env-names small{display:block; font-size:.55em; line-height:1.1}
+
+/* top flap — shape comes from the SVG clip paths at the bottom of the page */
+.flap{
+  position:absolute; left:0; right:0; top:0; height:60%;
+  z-index:5; transform-origin:top center; transform-style:preserve-3d;
+  transition:transform 1s cubic-bezier(.45,.05,.3,1), z-index 0s linear .5s;
+}
+.flap-face{position:absolute; inset:0; backface-visibility:hidden}
+.flap-face.front{-webkit-clip-path:url(#flapClip); clip-path:url(#flapClip)}
+.flap-face.front::after{ /* soft fold shading near the tip */
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.18));
+}
+.flap-face.back{
+  transform:rotateX(180deg);
+  -webkit-clip-path:url(#flapClipBack); clip-path:url(#flapClipBack);
+  background:var(--royal-deep);
+}
+.flap-face.back .liner{
+  position:absolute; inset:0;
+  -webkit-clip-path:url(#flapLinerBack); clip-path:url(#flapLinerBack);
 }
 
-/* top flap */
-.flap{
-  position:absolute; left:0; right:0; top:0; height:58%;
-  z-index:5; transform-origin:top center; transform-style:preserve-3d;
-  transition:transform .9s cubic-bezier(.45,.05,.3,1), z-index 0s linear .45s;
+.flap-shadow{ /* soft shadow under the closed flap so its edge reads */
+  position:absolute; left:0; right:0; top:0; height:60%; z-index:4;
+  -webkit-clip-path:url(#flapClip); clip-path:url(#flapClip);
+  background:rgba(4,30,70,.45); transform:translateY(3px);
+  transition:opacity .3s ease;
 }
-.flap-face{
-  position:absolute; inset:0; backface-visibility:hidden;
-  clip-path:polygon(0 0, 100% 0, 50% 100%);
-}
-.flap-face.front{background:linear-gradient(180deg, var(--sage-dark), var(--sage))}
-.flap-face.back{ /* gold-patterned liner seen once open */
-  transform:rotateX(180deg);
-  background:
-    repeating-linear-gradient(45deg, rgba(255,255,255,.12) 0 2px, transparent 2px 9px),
-    linear-gradient(0deg, var(--gold-soft), var(--gold));
-}
-.seal{
-  position:absolute; left:50%; bottom:0; width:calc(var(--env-w) * .13); aspect-ratio:1;
-  transform:translate(-50%, 45%); backface-visibility:hidden;
-  border-radius:50%; display:grid; place-items:center;
-  background:radial-gradient(circle at 35% 30%, #C9A46A, var(--gold) 55%, #8C6C3C);
-  box-shadow:0 2px 5px rgba(0,0,0,.25), inset 0 0 0 3px rgba(255,255,255,.18);
-  font-family:var(--script); color:var(--ivory); font-size:calc(var(--env-w) * .045);
-}
+.intro.is-open .flap-shadow{opacity:0}
 
 .hint{
   margin-top:calc(var(--env-w) * .12);
@@ -165,15 +197,23 @@ body.intro-active{overflow:hidden}
 
 /* ══════════════════ MAIN / FIRST PAGE ══════════════════ */
 .hero{
+  position:relative; overflow:hidden;
   min-height:100vh; min-height:100svh;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   padding:48px 16px; text-align:center;
-  background:radial-gradient(ellipse at 50% 30%, var(--ivory) 0%, var(--linen) 75%);
+  background:radial-gradient(ellipse at 50% 35%, #FFFFFF 0%, var(--mist) 75%);
+}
+.hero::after{ /* gold florals along the bottom edge */
+  content:""; position:absolute; left:0; right:0; bottom:0; height:180px; pointer-events:none;
+  background:var(--fl-gold) 0 100% / 160px repeat-x, var(--fl-gold) 80px 60% / 160px repeat-x;
+  -webkit-mask-image:linear-gradient(to top, #000 20%, transparent);
+          mask-image:linear-gradient(to top, #000 20%, transparent);
+  opacity:.7;
 }
 .hero .eyebrow{font-size:.85rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold)}
 .hero h2{
-  font-family:var(--script); font-weight:400; line-height:1;
-  font-size:clamp(3.6rem, 14vw, 7rem); margin:.25em 0 .15em;
+  font-family:var(--script); font-weight:400; line-height:1; color:var(--royal);
+  font-size:clamp(4rem, 16vw, 8rem); margin:.2em 0 .1em;
 }
 .hero .sub{font-style:italic; font-size:clamp(1.1rem, 3.5vw, 1.4rem); color:var(--ink-soft)}
 .hero .divider{width:90px; height:1px; background:var(--gold-soft); margin:28px auto}
@@ -190,15 +230,64 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   *,*::before,*::after{transition-duration:.01ms !important; transition-delay:0s !important; animation:none !important}
 }
 </style>
+
+<script>
+// Draws the floral motif once and exposes it in three colours as CSS variables.
+(function(){
+  function flower(cx, cy, r){
+    var s = '';
+    for (var i = 0; i < 8; i++)
+      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .55) + "' rx='" + r * .36 + "' ry='" + r * .62 +
+           "' fill-opacity='.45' transform='rotate(" + i * 45 + " " + cx + " " + cy + ")'/>";
+    for (var j = 0; j < 6; j++)
+      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .32) + "' rx='" + r * .2 + "' ry='" + r * .38 +
+           "' fill-opacity='.75' transform='rotate(" + (j * 60 + 20) + " " + cx + " " + cy + ")'/>";
+    return s + "<circle cx='" + cx + "' cy='" + cy + "' r='" + r * .16 + "'/>";
+  }
+  function leaf(x, y, rot, sc){
+    return "<path d='M0 0C7 -11 20 -13 30 -6C20 1 9 5 0 0Z' fill-opacity='.7' transform='translate(" +
+           x + " " + y + ") rotate(" + rot + ") scale(" + (sc || 1) + ")'/>";
+  }
+  function motif(color){
+    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>" +
+      "<g fill='" + color + "' stroke='none'>" +
+      "<path d='M52 58C80 70 96 96 122 122M52 58C32 80 26 102 18 134M122 122C142 100 150 62 140 28' fill='none' stroke='" + color + "' stroke-width='1.6' stroke-opacity='.7'/>" +
+      flower(52, 58, 26) + flower(122, 122, 15) +
+      leaf(84, 76, -30) + leaf(100, 96, 40, .8) + leaf(28, 98, 150) + leaf(22, 122, 210, .8) +
+      leaf(144, 62, -70, .9) + leaf(140, 30, -120, .7) + leaf(10, 20, 30, .8) +
+      "</g></svg>";
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  }
+  var root = document.documentElement.style;
+  root.setProperty('--fl-liner', motif('#8FB0D4'));
+  root.setProperty('--fl-env', motif('rgba(150,195,245,.24)'));
+  root.setProperty('--fl-gold', motif('#D7B472'));
+})();
+</script>
 </head>
 <body class="intro-active">
+
+<!-- Flap shapes (rounded tip). The back face is drawn flipped because it is rotated with the flap. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="flapClip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0 L1,0 L0.6,0.86 Q0.5,1.02 0.4,0.86 Z"/>
+    </clipPath>
+    <clipPath id="flapClipBack" clipPathUnits="objectBoundingBox">
+      <path d="M0,1 L1,1 L0.6,0.14 Q0.5,-0.02 0.4,0.14 Z"/>
+    </clipPath>
+    <clipPath id="flapLinerBack" clipPathUnits="objectBoundingBox">
+      <path d="M0.055,1 L0.945,1 L0.585,0.22 Q0.5,0.07 0.415,0.22 Z"/>
+    </clipPath>
+  </defs>
+</svg>
 
 <!-- ══════════════════ INTRO ══════════════════ -->
 <div class="intro" id="intro" aria-label="Your invitation">
   <p class="greeting" id="greeting">You've got mail</p>
 
   <div class="envelope" aria-hidden="true">
-    <div class="env-back"></div>
+    <div class="env-back royal-paper"><div class="liner"></div></div>
     <div class="card">
       <div class="card-inner">
         <div class="photo">
@@ -210,11 +299,15 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
         <p class="names">John &amp; Jess</p>
       </div>
     </div>
-    <div class="env-front"></div>
+    <div class="env-front">
+      <div class="sides royal-paper"></div>
+      <div class="bottom royal-paper"></div>
+      <p class="env-names">John<small>and</small>Jess</p>
+    </div>
+    <div class="flap-shadow"></div>
     <div class="flap">
-      <div class="flap-face front"></div>
-      <div class="flap-face back"></div>
-      <div class="seal">J&amp;J</div>
+      <div class="flap-face front royal-paper"></div>
+      <div class="flap-face back"><div class="liner"></div></div>
     </div>
   </div>
 
@@ -237,7 +330,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   var intro = document.getElementById('intro');
   var btn = document.getElementById('continue');
 
-  // Personalise with ?to=Name (e.g. index.html?to=Aunt%20Mary)
+  // Personalise with ?to=Name (e.g. ?to=Aunt%20Mary)
   var guest = new URLSearchParams(location.search).get('to');
   if (guest) {
     var g = document.getElementById('greeting');
@@ -249,10 +342,10 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 
   if ('ontouchstart' in window) btn.textContent = 'Tap to continue';
 
-  // Auto sequence: greeting → flap opens → card slides half out
+  // Auto sequence: closed envelope → flap opens → card slides partly out
   setTimeout(function(){ intro.classList.add('is-ready'); }, 200);
-  setTimeout(function(){ intro.classList.add('is-open'); }, 900);
-  setTimeout(function(){ intro.classList.add('is-out'); }, 1700);
+  setTimeout(function(){ intro.classList.add('is-open'); }, 1100);
+  setTimeout(function(){ intro.classList.add('is-out'); }, 2000);
 
   var left = false;
   function enter(){
