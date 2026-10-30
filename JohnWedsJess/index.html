@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>John &amp; Jess — We're Getting Married</title>
+<meta name="description" content="John &amp; Jess are getting married. Open your invitation.">
+<meta name="theme-color" content="#EFE8DC">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap">
+
+<style>
+/* ══════════════════ TOKENS ══════════════════ */
+:root{
+  --linen:#EFE8DC; --ivory:#FCF9F3;
+  --sage:#A9B79C; --sage-dark:#8E9E80; --sage-deep:#7A8B6C;
+  --ink:#2F3E2E; --ink-soft:#56634F;
+  --gold:#B08D57; --gold-soft:#D8C29A;
+  --serif:"Cormorant Garamond", Georgia, serif;
+  --script:"Pinyon Script", cursive;
+  --env-w:min(420px, 88vw);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--serif); color:var(--ink);
+  background:var(--linen);
+  -webkit-font-smoothing:antialiased;
+}
+body.intro-active{overflow:hidden}
+
+/* ══════════════════ INTRO / ENVELOPE ══════════════════ */
+.intro{
+  position:fixed; inset:0; z-index:100;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:
+    radial-gradient(ellipse at 50% 40%, #F7F2E9 0%, var(--linen) 60%, #E4DACA 100%);
+  cursor:pointer; overflow:hidden;
+  transition:opacity .9s ease .5s, visibility 0s linear 1.4s;
+}
+.intro.is-gone{opacity:0; visibility:hidden}
+
+.greeting{
+  font-style:italic; font-size:clamp(1.05rem, 3.6vw, 1.3rem); color:var(--ink-soft);
+  text-align:center; margin-bottom:calc(var(--env-w) * .42);
+  opacity:0; transform:translateY(8px);
+  transition:opacity .8s ease, transform .8s ease;
+}
+.greeting strong{font-weight:600; font-style:normal; color:var(--ink)}
+.intro.is-ready .greeting{opacity:1; transform:none}
+
+.envelope{
+  position:relative; width:var(--env-w); height:calc(var(--env-w) * .66);
+  perspective:1200px;
+  transition:transform 1s cubic-bezier(.5,0,.7,.4), opacity .8s ease;
+}
+.env-back{
+  position:absolute; inset:0; border-radius:6px;
+  background:linear-gradient(180deg, var(--sage-deep), var(--sage-dark));
+  box-shadow:0 18px 40px -12px rgba(47,62,46,.45), 0 4px 10px rgba(47,62,46,.15);
+}
+
+/* the card */
+.card{
+  position:absolute; left:5%; right:5%; bottom:4%; height:92%;
+  z-index:2; border-radius:4px;
+  background:var(--ivory);
+  box-shadow:0 2px 8px rgba(47,62,46,.18);
+  transition:transform 1.3s cubic-bezier(.22,.9,.25,1);
+}
+.card::before{ /* thin gold frame */
+  content:""; position:absolute; inset:7px; border:1px solid var(--gold-soft); border-radius:2px;
+  pointer-events:none;
+}
+.card-inner{
+  position:relative; height:100%;
+  display:flex; flex-direction:column; align-items:center;
+  padding-top:calc(var(--env-w) * .045);
+  text-align:center;
+}
+.photo{
+  position:relative; width:calc(var(--env-w) * .17); aspect-ratio:1;
+  border-radius:50%; overflow:hidden;
+  border:2px solid var(--gold-soft);
+  box-shadow:0 0 0 3px var(--ivory), 0 0 0 4px var(--gold-soft);
+  background:var(--sage);
+  display:grid; place-items:center;
+}
+.photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.photo .mono{font-family:var(--script); color:var(--ivory); font-size:calc(var(--env-w) * .06)}
+.card h1{
+  font-family:var(--script); font-weight:400; color:var(--ink);
+  font-size:calc(var(--env-w) * .085); line-height:1.1;
+  margin-top:calc(var(--env-w) * .02);
+}
+.card .names{
+  font-size:calc(var(--env-w) * .036); letter-spacing:.3em; text-transform:uppercase;
+  color:var(--gold); margin-top:calc(var(--env-w) * .01);
+}
+
+/* front pocket (side + bottom flaps) */
+.env-front{
+  position:absolute; inset:0; z-index:3; border-radius:6px; overflow:hidden;
+  pointer-events:none;
+}
+.env-front::before, .env-front::after{content:""; position:absolute; inset:0}
+.env-front::before{ /* side flaps */
+  background:linear-gradient(90deg, var(--sage-dark), var(--sage) 50%, var(--sage-dark));
+  clip-path:polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+}
+.env-front::after{ /* bottom flap */
+  background:linear-gradient(0deg, var(--sage-dark), var(--sage));
+  clip-path:polygon(0 100%, 50% 44%, 100% 100%);
+  filter:drop-shadow(0 -1px 0 rgba(255,255,255,.25));
+}
+
+/* top flap */
+.flap{
+  position:absolute; left:0; right:0; top:0; height:58%;
+  z-index:5; transform-origin:top center; transform-style:preserve-3d;
+  transition:transform .9s cubic-bezier(.45,.05,.3,1), z-index 0s linear .45s;
+}
+.flap-face{
+  position:absolute; inset:0; backface-visibility:hidden;
+  clip-path:polygon(0 0, 100% 0, 50% 100%);
+}
+.flap-face.front{background:linear-gradient(180deg, var(--sage-dark), var(--sage))}
+.flap-face.back{ /* gold-patterned liner seen once open */
+  transform:rotateX(180deg);
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.12) 0 2px, transparent 2px 9px),
+    linear-gradient(0deg, var(--gold-soft), var(--gold));
+}
+.seal{
+  position:absolute; left:50%; bottom:0; width:calc(var(--env-w) * .13); aspect-ratio:1;
+  transform:translate(-50%, 45%); backface-visibility:hidden;
+  border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle at 35% 30%, #C9A46A, var(--gold) 55%, #8C6C3C);
+  box-shadow:0 2px 5px rgba(0,0,0,.25), inset 0 0 0 3px rgba(255,255,255,.18);
+  font-family:var(--script); color:var(--ivory); font-size:calc(var(--env-w) * .045);
+}
+
+.hint{
+  margin-top:calc(var(--env-w) * .12);
+  font-size:.82rem; letter-spacing:.32em; text-transform:uppercase; color:var(--ink-soft);
+  background:none; border:0; font-family:inherit; cursor:pointer;
+  padding:.6em 1em;
+  opacity:0; transition:opacity .8s ease;
+}
+.hint:focus-visible{outline:1px solid var(--gold); outline-offset:4px}
+
+/* sequence states */
+.intro.is-open .flap{transform:rotateX(180deg); z-index:1}
+.intro.is-out  .card{transform:translateY(-62%)}
+.intro.is-out  .hint{opacity:1; animation:pulse 2.4s ease-in-out 1s infinite}
+.intro.is-leaving .card{transform:translateY(-135%)}
+.intro.is-leaving .envelope{transform:translateY(60vh); opacity:0}
+.intro.is-leaving .greeting,
+.intro.is-leaving .hint{opacity:0; animation:none}
+
+@keyframes pulse{50%{opacity:.4}}
+
+/* ══════════════════ MAIN / FIRST PAGE ══════════════════ */
+.hero{
+  min-height:100vh; min-height:100svh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:48px 16px; text-align:center;
+  background:radial-gradient(ellipse at 50% 30%, var(--ivory) 0%, var(--linen) 75%);
+}
+.hero .eyebrow{font-size:.85rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold)}
+.hero h2{
+  font-family:var(--script); font-weight:400; line-height:1;
+  font-size:clamp(3.6rem, 14vw, 7rem); margin:.25em 0 .15em;
+}
+.hero .sub{font-style:italic; font-size:clamp(1.1rem, 3.5vw, 1.4rem); color:var(--ink-soft)}
+.hero .divider{width:90px; height:1px; background:var(--gold-soft); margin:28px auto}
+.hero .date{font-size:1rem; letter-spacing:.25em; text-transform:uppercase}
+
+body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
+.hero > *{transition:opacity 1s ease, transform 1s ease}
+.hero > :nth-child(2){transition-delay:.15s}
+.hero > :nth-child(3){transition-delay:.3s}
+.hero > :nth-child(4){transition-delay:.45s}
+.hero > :nth-child(5){transition-delay:.6s}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:.01ms !important; transition-delay:0s !important; animation:none !important}
+}
+</style>
+</head>
+<body class="intro-active">
+
+<!-- ══════════════════ INTRO ══════════════════ -->
+<div class="intro" id="intro" aria-label="Your invitation">
+  <p class="greeting" id="greeting">You've got mail</p>
+
+  <div class="envelope" aria-hidden="true">
+    <div class="env-back"></div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="photo">
+          <span class="mono">J&amp;J</span>
+          <!-- Drop the couple's photo at photos/couple.jpg; the monogram shows until then -->
+          <img src="photos/couple.jpg" alt="" onerror="this.remove()">
+        </div>
+        <h1>We&rsquo;re getting married!</h1>
+        <p class="names">John &amp; Jess</p>
+      </div>
+    </div>
+    <div class="env-front"></div>
+    <div class="flap">
+      <div class="flap-face front"></div>
+      <div class="flap-face back"></div>
+      <div class="seal">J&amp;J</div>
+    </div>
+  </div>
+
+  <button class="hint" id="continue" type="button">Click to continue</button>
+</div>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main id="main">
+  <section class="hero" id="home">
+    <p class="eyebrow">Together with their families</p>
+    <h2>John &amp; Jess</h2>
+    <p class="sub">are getting married</p>
+    <div class="divider"></div>
+    <p class="date">Date &amp; venue coming soon</p>
+  </section>
+</main>
+
+<script>
+(function(){
+  var intro = document.getElementById('intro');
+  var btn = document.getElementById('continue');
+
+  // Personalise with ?to=Name (e.g. index.html?to=Aunt%20Mary)
+  var guest = new URLSearchParams(location.search).get('to');
+  if (guest) {
+    var g = document.getElementById('greeting');
+    g.textContent = 'Dear ';
+    var s = document.createElement('strong');
+    s.textContent = guest.trim();
+    g.append(s, ', you’ve got mail');
+  }
+
+  if ('ontouchstart' in window) btn.textContent = 'Tap to continue';
+
+  // Auto sequence: greeting → flap opens → card slides half out
+  setTimeout(function(){ intro.classList.add('is-ready'); }, 200);
+  setTimeout(function(){ intro.classList.add('is-open'); }, 900);
+  setTimeout(function(){ intro.classList.add('is-out'); }, 1700);
+
+  var left = false;
+  function enter(){
+    if (left || !intro.classList.contains('is-out')) return;
+    left = true;
+    intro.classList.add('is-leaving');
+    setTimeout(function(){
+      intro.classList.add('is-gone');
+      document.body.classList.remove('intro-active');
+    }, 700);
+    setTimeout(function(){ intro.remove(); }, 2300);
+  }
+  intro.addEventListener('click', enter);
+})();
+</script>
+</body>
+</html>
