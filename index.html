@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#EEF3F9">
 
 <link rel="preload" href="images/envelope-front.webp" as="image">
+<link rel="preload" href="images/envelope-back.webp" as="image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&family=Sacramento&display=swap">
@@ -92,11 +93,6 @@ body.intro-active{overflow:hidden}
     var(--lf-liner) 75px 75px / 150px,
     #FFFFFF;
 }
-.script-names{
-  font-family:var(--script); color:#fff; text-align:center; line-height:.78;
-  text-shadow:0 1px 6px rgba(0,0,0,.18);
-}
-.script-names small{display:block; font-size:.5em; line-height:1.15}
 
 /* — front of the envelope (closed, shown on load) — */
 .view.front{
@@ -125,32 +121,16 @@ body.intro-active{overflow:hidden}
   position:absolute; inset:0; z-index:3; border-radius:4px; overflow:hidden;
   pointer-events:none;
 }
-.env-front .sides, .env-front .bottom{position:absolute; inset:0}
-.env-front .sides{clip-path:polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%)}
-.env-front .sides::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 30% 70%, rgba(0,0,0,.14));
-}
-.env-front .bottom{
-  clip-path:polygon(0 100%, 0 99%, 50% 48%, 100% 99%, 100% 100%);
-  filter:brightness(1.07);
-}
-.env-front .script-names{
-  position:absolute; left:0; right:0; bottom:7%;
-  font-size:calc(var(--env-w) * .1);
-}
+/* the closed back is the supplied artwork, cut along its gold flap edge:
+   the pocket is everything below the edge, the flap everything above it */
+.art{background:url(images/envelope-back.webp) 0 0 / var(--env-w) calc(var(--env-w) * .66) no-repeat var(--royal)}
+.env-front .pocket{position:absolute; inset:0; -webkit-clip-path:url(#pocketClip); clip-path:url(#pocketClip)}
 
 /* top flap — shape comes from the SVG clip paths in the page */
-.flap, .flap-shadow{position:absolute; left:0; right:0; top:0; height:62%}
+.flap{position:absolute; left:0; right:0; top:0; height:51.5%}
 .flap{
   z-index:5; transform-origin:top center; transform-style:preserve-3d;
   transition:transform 1s cubic-bezier(.45,0,.55,1), z-index 0s linear .5s;
-}
-.flap-shadow{
-  z-index:4; transform:translateY(3px);
-  -webkit-clip-path:url(#flapClip); clip-path:url(#flapClip);
-  background:rgba(4,30,70,.45);
-  transition:opacity .3s ease;
 }
 .flap-face{position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden}
 /* iOS Safari can show a face's back side anyway, so the faces are also swapped
@@ -159,21 +139,16 @@ body.intro-active{overflow:hidden}
 .intro.is-open .flap-face.outside{visibility:hidden; transition:visibility 0s linear .5s}
 .intro.is-open .flap-face.open{visibility:visible; transition:visibility 0s linear .5s}
 .flap-face.outside{-webkit-clip-path:url(#flapClip); clip-path:url(#flapClip)}
-.flap-face.outside::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.18));
-}
 .flap-face.open{ /* what shows once the flap stands up: blue with a white sprig */
   transform:rotateX(180deg);
   -webkit-clip-path:url(#flapClipOpen); clip-path:url(#flapClipOpen);
 }
 .flap-face.open::after{
-  content:""; position:absolute; left:50%; top:6%; width:22%; height:62%;
+  content:""; position:absolute; left:50%; top:8%; width:22%; height:72%;
   transform:translateX(-50%);
   background:var(--sprig-white) center / contain no-repeat;
 }
 .intro.is-open .flap{transform:rotateX(180deg); z-index:1}
-.intro.is-open .flap-shadow{opacity:0}
 
 /* — the card — */
 .card{
@@ -369,14 +344,18 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 </head>
 <body class="intro-active">
 
-<!-- Flap shapes (rounded tip). The open face is drawn flipped because it turns over with the flap. -->
+<!-- Flap and pocket shapes, traced from the gold flap edge in images/envelope-back.webp.
+     The open face is drawn flipped because it turns over with the flap. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <clipPath id="flapClip" clipPathUnits="objectBoundingBox">
-      <path d="M0,0 L1,0 L0.64,0.8 Q0.5,1.06 0.36,0.8 Z"/>
+      <path d="M0,0 L1,0 L0.678,0.772 C0.618,0.92 0.558,1 0.494,1 C0.43,1 0.37,0.92 0.31,0.772 Z"/>
     </clipPath>
     <clipPath id="flapClipOpen" clipPathUnits="objectBoundingBox">
-      <path d="M0,1 L1,1 L0.64,0.2 Q0.5,-0.06 0.36,0.2 Z"/>
+      <path d="M0,1 L1,1 L0.678,0.228 C0.618,0.08 0.558,0 0.494,0 C0.43,0 0.37,0.08 0.31,0.228 Z"/>
+    </clipPath>
+    <clipPath id="pocketClip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0 L0.312,0.388 C0.372,0.464 0.43,0.507 0.494,0.507 C0.558,0.507 0.616,0.464 0.676,0.388 L1,0 L1,1 L0,1 Z"/>
     </clipPath>
   </defs>
 </svg>
@@ -423,13 +402,10 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
       </div>
 
       <div class="env-front">
-        <div class="sides royal"></div>
-        <div class="bottom royal"></div>
-        <p class="script-names">John<small>and</small>Jess</p>
+        <div class="pocket art"></div>
       </div>
-      <div class="flap-shadow"></div>
       <div class="flap">
-        <div class="flap-face outside royal"></div>
+        <div class="flap-face outside art"></div>
         <div class="flap-face open royal"></div>
       </div>
     </div>
@@ -493,12 +469,16 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     at(5100, function(){ add('is-card'); card.style.transform = finalTransform(); });
   }
   if (document.fonts && document.fonts.load) {
-    var front = new Image();
-    front.src = 'images/envelope-front.webp';
+    function decoded(src){
+      var img = new Image();
+      img.src = src;
+      return img.decode ? img.decode() : Promise.resolve();
+    }
     Promise.all([
       document.fonts.load('1em Sacramento'),
       document.fonts.load('1em "Pinyon Script"'),
-      front.decode ? front.decode() : Promise.resolve()
+      decoded('images/envelope-front.webp'),
+      decoded('images/envelope-back.webp')
     ]).then(start, start);
     at(2500, start); // don't wait forever on a slow connection
   } else {
