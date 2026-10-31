@@ -188,7 +188,19 @@ body.intro-active{overflow:hidden}
   font:inherit; color:transparent; overflow:hidden;
 }
 .continue:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
-.intro.is-card .continue{animation:glow 2.4s ease-in-out 1.4s infinite}
+/* Once the flip ends, a flat copy of the invitation laid out at its on-screen size takes over
+   from the animated card: 3D-transformed layers are drawn at their unscaled size and then
+   stretched, which blurs the artwork, while this copy is drawn at full resolution */
+.final-card{
+  position:fixed; z-index:20; opacity:0; visibility:hidden; pointer-events:none;
+  border-radius:3px; overflow:hidden; background:#FBF7EF;
+  box-shadow:0 24px 50px -18px rgba(10,60,130,.45), 0 2px 8px rgba(10,60,130,.12);
+}
+.final-card img{display:block; width:100%; height:100%}
+.intro.is-final .final-card{opacity:1; visibility:visible; pointer-events:auto}
+.intro.is-final .card{visibility:hidden}
+.intro.is-final .continue{animation:glow 2.4s ease-in-out .6s infinite}
+.intro.is-leaving .final-card{opacity:0; transform:translateY(-40px); transition:opacity .7s ease, transform .8s ease}
 @keyframes glow{50%{box-shadow:0 0 0 3px rgba(191,148,80,.25), 0 0 18px rgba(191,148,80,.35)}}
 
 
@@ -310,7 +322,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 <div class="intro" id="intro" aria-label="Your invitation">
   <p class="greeting" id="greeting">You've got mail</p>
 
-  <div class="scene">
+  <div class="scene" aria-hidden="true">
     <!-- envelope front: what the guest sees first -->
     <div class="view front"></div>
 
@@ -320,11 +332,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 
       <div class="card" id="card">
         <div class="card-face back"></div>
-        <div class="card-face inside">
-          <p class="sr-only">Together with our families, John &amp; Jess: we're getting married!
-            And we would love for you to be part of our celebration.</p>
-          <button class="continue" id="continue" type="button">Click to continue</button>
-        </div>
+        <div class="card-face inside"></div>
       </div>
 
       <div class="env-front">
@@ -338,6 +346,11 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     </div>
   </div>
 
+
+  <div class="final-card" id="finalCard">
+    <img src="images/card-invitation.webp" alt="Together with our families, John &amp; Jess: we're getting married! And we would love for you to be part of our celebration.">
+    <button class="continue" id="continue" type="button">Click to continue</button>
+  </div>
 </div>
 
 <!-- ══════════════════ MAIN ══════════════════ -->
@@ -373,12 +386,23 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   // envelope), then lifts just clear of it, then comes to the centre and flips face up.
   function halfOutY(){ return -(card.offsetTop + card.offsetHeight) + card.offsetParent.offsetHeight * .284; }
   function liftY(){ return -(card.offsetTop + card.offsetHeight) - 6; }
+  function finalScale(){
+    var faceH = card.offsetWidth * 1086 / 1448;
+    return Math.min(1.8, (innerWidth - 32) / card.offsetWidth, innerHeight * .8 / faceH);
+  }
   function finalTransform(shift){
     var env = card.offsetParent.getBoundingClientRect();
     var centre = env.top + card.offsetTop + card.offsetHeight / 2;
-    var faceH = card.offsetWidth * 1086 / 1448;
-    var scale = Math.min(1.8, (innerWidth - 32) / card.offsetWidth, innerHeight * .8 / faceH);
-    return 'translateY(' + (innerHeight / 2 - centre - (shift || 0)) + 'px) rotateY(180deg) scale(' + scale.toFixed(3) + ')';
+    return 'translateY(' + (innerHeight / 2 - centre - (shift || 0)) + 'px) rotateY(180deg) scale(' + finalScale().toFixed(3) + ')';
+  }
+  // the flat card: same size and centre as the animated card's invitation face, whole pixels
+  var finalCard = document.getElementById('finalCard');
+  function placeFinalCard(){
+    var w = Math.round(card.offsetWidth * finalScale()), h = Math.round(w * 1086 / 1448);
+    finalCard.style.width = w + 'px';
+    finalCard.style.height = h + 'px';
+    finalCard.style.left = Math.round((innerWidth - w) / 2) + 'px';
+    finalCard.style.top = Math.round((innerHeight - h) / 2) + 'px';
   }
 
   // Sequence: closed front (2s) → envelope turns over → flap opens → card rises → card flips
@@ -395,6 +419,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     at(5800, function(){ card.style.transform = 'translateY(' + liftY() + 'px)'; });
     at(6700, function(){ add('is-lifted'); });
     at(6800, function(){ add('is-card'); card.style.transform = finalTransform(); });
+    at(8150, function(){ if (!left) { placeFinalCard(); add('is-final'); } });
   }
   if (document.fonts && document.fonts.load) {
     function decoded(src){
@@ -416,8 +441,10 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   }
 
   addEventListener('resize', function(){
-    if (intro.classList.contains('is-card') && !intro.classList.contains('is-leaving'))
+    if (intro.classList.contains('is-card') && !intro.classList.contains('is-leaving')) {
       card.style.transform = finalTransform();
+      placeFinalCard();
+    }
   });
 
   var left = false;
