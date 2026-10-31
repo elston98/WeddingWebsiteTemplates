@@ -11,9 +11,10 @@
 <link rel="preload" href="images/envelope-back.webp" as="image">
 <link rel="preload" href="images/envelope-pocket.webp" as="image">
 <link rel="preload" href="images/card-monogram.webp" as="image">
+<link rel="preload" href="images/card-invitation.webp" as="image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&family=Sacramento&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Sacramento&display=swap">
 
 <style>
 /* ══════════════════ TOKENS ══════════════════ */
@@ -21,14 +22,13 @@
   --mist:#EEF3F9; --paper:#FFFDF9;
   --royal:#145AAE; --royal-deep:#0A3C82; --royal-ink:#123A6B;
   --gold:#BF9450; --gold-dark:#A27A3C; --gold-soft:#E0C48E;
-  --blush:#F8EFEC; --slate:#5B6886; --tan:#C39463;
   --ink-soft:#4A6283;
   --serif:"Cormorant Garamond", Georgia, serif;
   --script:"Sacramento", cursive;
   --env-w:min(420px, 86vw);
   /* leaf patterns and sprigs are generated in the script below */
   --lf-back:none; --lf-liner:none; --lf-gold:none;
-  --sprig-white:none; --sprig-gold:none; --bouquet:none;
+  --sprig-white:none; --sprig-gold:none;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -63,17 +63,6 @@ body.intro-active{overflow:hidden}
 .greeting strong{font-weight:600; font-style:normal; color:var(--royal-ink)}
 .intro.is-ready .greeting{opacity:1; transform:none}
 .intro.is-rising .greeting{opacity:0}
-
-.hint{
-  position:absolute; bottom:max(7vh, 24px); left:50%; transform:translateX(-50%);
-  font-size:.82rem; letter-spacing:.32em; text-transform:uppercase; color:var(--ink-soft);
-  background:none; border:0; font-family:inherit; cursor:pointer; white-space:nowrap;
-  padding:.6em 1em;
-  opacity:0; transition:opacity .8s ease;
-}
-.hint:focus-visible{outline:1px solid var(--gold); outline-offset:4px}
-.intro.is-card .hint{opacity:1; animation:pulse 2.4s ease-in-out 1s infinite}
-@keyframes pulse{50%{opacity:.4}}
 
 /* the envelope lives in .scene; front and back are two views swapped mid-turn */
 .scene{
@@ -175,7 +164,7 @@ body.intro-active{overflow:hidden}
 .intro.is-card .card-face.inside{visibility:visible; transition:visibility 0s linear .65s}
 .card-face{
   position:absolute; inset:0; border-radius:3px; overflow:hidden;
-  background:var(--blush); -webkit-backface-visibility:hidden; backface-visibility:hidden;
+  background:#F7F0E6; -webkit-backface-visibility:hidden; backface-visibility:hidden;
   box-shadow:0 2px 10px rgba(10,60,130,.2);
 }
 .intro.is-card .card-face{box-shadow:0 24px 50px -18px rgba(10,60,130,.45), 0 2px 8px rgba(10,60,130,.12)}
@@ -185,36 +174,23 @@ body.intro-active{overflow:hidden}
 /* back of the card: the JJ monogram card from the open-envelope artwork */
 .card-face.back{background:url(images/card-monogram.webp) center / 100% 100% no-repeat #F7F0E6}
 
-/* invitation side: text on the left, gold florals bleeding off the right */
-.bouquet{
-  position:absolute; right:-8%; top:-7%; height:114%; aspect-ratio:3 / 4;
-  background:var(--bouquet) center / contain no-repeat;
+/* invitation side: the supplied artwork (images/card-invitation.webp). It is squarer than the
+   monogram card, so it is centred on the card and stands taller than it (margin % is of the width) */
+.card-face.inside{
+  inset:auto; left:0; right:0; top:50%; margin-top:-37.5%; aspect-ratio:1448 / 1086;
+  background:url(images/card-invitation.webp) center / 100% 100% no-repeat #FBF7EF;
 }
-.card-inner{
-  position:relative; z-index:1; height:100%; width:68%;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; color:var(--slate); padding-left:3%;
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+/* invisible button over the "Click to continue" pill drawn in the artwork */
+.continue{
+  position:absolute; left:37%; top:80%; width:26.4%; height:6.2%;
+  border:0; border-radius:999px; background:none; cursor:pointer;
+  font:inherit; color:transparent; overflow:hidden;
 }
-.card .caps{
-  font-size:calc(var(--env-w) * .021); letter-spacing:.16em; text-transform:uppercase; line-height:1.55;
-}
-.card .nowrap{white-space:nowrap; letter-spacing:.1em}
-.card .couple{
-  font-family:var(--script); font-weight:400; white-space:nowrap;
-  font-size:calc(var(--env-w) * .1); line-height:1; margin:calc(var(--env-w) * .015) 0 calc(var(--env-w) * .02);
-}
-.card .couple small{font-size:.45em; margin:0 .1em}
-.when{
-  display:flex; align-items:center; gap:calc(var(--env-w) * .018);
-  margin:calc(var(--env-w) * .03) 0 calc(var(--env-w) * .026);
-}
-.when b{
-  font-weight:500; font-size:calc(var(--env-w) * .07); line-height:1;
-  border-left:1px solid var(--slate); padding-left:calc(var(--env-w) * .018);
-}
-.when .side{text-align:left}
-.when .side + .side{border-left:1px solid var(--slate); padding-left:calc(var(--env-w) * .018)}
-.when .side strong{font-weight:600}
+.continue:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
+.intro.is-card .continue{animation:glow 2.4s ease-in-out 1.4s infinite}
+@keyframes glow{50%{box-shadow:0 0 0 3px rgba(191,148,80,.25), 0 0 18px rgba(191,148,80,.35)}}
+
 
 /* envelope drops away once the card is out */
 .intro.is-card .env-shell,
@@ -228,7 +204,6 @@ body.intro-active{overflow:hidden}
 /* fade the faces, not the card: opacity on the card itself would flatten its 3D flip */
 .intro.is-leaving .card{transition:transform .8s ease}
 .intro.is-leaving.is-card .card-face{opacity:0; transition:opacity .7s ease}
-.intro.is-leaving .hint{opacity:0; animation:none}
 
 /* ══════════════════ MAIN / FIRST PAGE ══════════════════ */
 .hero{
@@ -305,40 +280,11 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   function sprig(color){
     return uri(80, 220, branch(40, 215, 44, 10, 10, 8, 42, true, color));
   }
-  // silhouette flower: petals in `col`, separated by thin lines of the paper colour `bg`
-  function bloom(cx, cy, r, rot, col, bg){
-    var s = "<g transform='rotate(" + rot + ' ' + cx + ' ' + cy + ")' fill='" + col + "' stroke='" + bg + "' stroke-width='" + (r * .05).toFixed(2) + "'>";
-    for (var i = 0; i < 8; i++)
-      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .52) + "' rx='" + r * .4 + "' ry='" + r * .55 + "' transform='rotate(" + i * 45 + ' ' + cx + ' ' + cy + ")'/>";
-    for (var j = 0; j < 5; j++)
-      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .26) + "' rx='" + r * .22 + "' ry='" + r * .3 + "' transform='rotate(" + (j * 72 + 18) + ' ' + cx + ' ' + cy + ")'/>";
-    return s + "<circle cx='" + cx + "' cy='" + cy + "' r='" + r * .14 + "'/></g>";
-  }
-  function bouquet(col, bg){
-    function sprays(){
-      return branch(165, 200, 85, 150, 14, 4, 26, false, col) +
-             branch(170, 320, 60, 335, -14, 5, 26, false, col) +
-             branch(190, 80, 90, 0, 14, 5, 26, false, col) +
-             branch(210, 250, 110, 395, 10, 5, 26, false, col) +
-             branch(240, 40, 300, -10, -8, 3, 24, false, col) +
-             branch(150, 150, 60, 60, -12, 4, 22, false, col);
-    }
-    var berries = '';
-    [[62, 248], [70, 258], [56, 262], [100, 70], [108, 60], [94, 58], [70, 390], [80, 382]].forEach(function(b){
-      berries += "<circle cx='" + b[0] + "' cy='" + b[1] + "' r='4.5' fill='" + col + "'/>";
-    });
-    return uri(300, 400, sprays() + berries +
-      bloom(215, 125, 56, 10, col, bg) + bloom(195, 300, 62, -8, col, bg) +
-      bloom(112, 228, 34, 20, col, bg) + bloom(272, 215, 30, 0, col, bg) +
-      bloom(128, 118, 22, 15, col, bg) + bloom(98, 352, 24, 5, col, bg) +
-      bloom(285, 395, 34, 30, col, bg) + bloom(275, 30, 28, 12, col, bg));
-  }
   var root = document.documentElement.style;
   root.setProperty('--lf-back', pattern('rgba(150,195,245,.22)'));
   root.setProperty('--lf-liner', pattern('rgba(62,104,170,.55)'));
   root.setProperty('--sprig-white', sprig('#FFFFFF'));
   root.setProperty('--sprig-gold', sprig('#C29A57'));
-  root.setProperty('--bouquet', bouquet('#C39463', '#F8EFEC'));
 })();
 </script>
 </head>
@@ -364,7 +310,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 <div class="intro" id="intro" aria-label="Your invitation">
   <p class="greeting" id="greeting">You've got mail</p>
 
-  <div class="scene" aria-hidden="true">
+  <div class="scene">
     <!-- envelope front: what the guest sees first -->
     <div class="view front"></div>
 
@@ -375,19 +321,9 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
       <div class="card" id="card">
         <div class="card-face back"></div>
         <div class="card-face inside">
-          <i class="bouquet"></i>
-          <div class="card-inner">
-            <p class="caps">Together with their families</p>
-            <h1 class="couple">John <small>and</small> Jess</h1>
-            <p class="caps nowrap">invite you to their wedding celebration</p>
-            <!-- Placeholder date, time and venue: replace once confirmed -->
-            <div class="when caps">
-              <b>DD</b>
-              <span class="side"><strong>Month</strong><br>Year</span>
-              <span class="side"><strong>Day</strong><br>at time</span>
-            </div>
-            <p class="caps">Venue name<br>Address line<br>City, State</p>
-          </div>
+          <p class="sr-only">Together with our families, John &amp; Jess: we're getting married!
+            And we would love for you to be part of our celebration.</p>
+          <button class="continue" id="continue" type="button">Click to continue</button>
         </div>
       </div>
 
@@ -402,7 +338,6 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     </div>
   </div>
 
-  <button class="hint" id="continue" type="button">Click to continue</button>
 </div>
 
 <!-- ══════════════════ MAIN ══════════════════ -->
@@ -420,7 +355,6 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 (function(){
   var intro = document.getElementById('intro');
   var card = document.getElementById('card');
-  var btn = document.getElementById('continue');
 
   // Personalise with ?to=Name (e.g. ?to=Aunt%20Mary)
   var guest = new URLSearchParams(location.search).get('to');
@@ -432,8 +366,6 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     g.append(s, ', you’ve got mail');
   }
 
-  if ('ontouchstart' in window) btn.textContent = 'Tap to continue';
-
   function at(ms, fn){ setTimeout(fn, ms); }
   function add(c){ intro.classList.add(c); }
 
@@ -444,7 +376,8 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   function finalTransform(shift){
     var env = card.offsetParent.getBoundingClientRect();
     var centre = env.top + card.offsetTop + card.offsetHeight / 2;
-    var scale = Math.min(1.3, (innerWidth - 32) / card.offsetWidth, innerHeight * .62 / card.offsetHeight);
+    var faceH = card.offsetWidth * 1086 / 1448;
+    var scale = Math.min(1.8, (innerWidth - 32) / card.offsetWidth, innerHeight * .8 / faceH);
     return 'translateY(' + (innerHeight / 2 - centre - (shift || 0)) + 'px) rotateY(180deg) scale(' + scale.toFixed(3) + ')';
   }
 
@@ -471,11 +404,11 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     }
     Promise.all([
       document.fonts.load('1em Sacramento'),
-      document.fonts.load('1em "Pinyon Script"'),
       decoded('images/envelope-front.webp'),
       decoded('images/envelope-back.webp'),
       decoded('images/envelope-pocket.webp'),
-      decoded('images/card-monogram.webp')
+      decoded('images/card-monogram.webp'),
+      decoded('images/card-invitation.webp')
     ]).then(start, start);
     at(2500, start); // don't wait forever on a slow connection
   } else {
