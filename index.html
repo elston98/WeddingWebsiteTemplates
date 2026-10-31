@@ -9,6 +9,8 @@
 
 <link rel="preload" href="images/envelope-front.webp" as="image">
 <link rel="preload" href="images/envelope-back.webp" as="image">
+<link rel="preload" href="images/envelope-pocket.webp" as="image">
+<link rel="preload" href="images/card-monogram.webp" as="image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&family=Sacramento&display=swap">
@@ -26,7 +28,7 @@
   --env-w:min(420px, 86vw);
   /* leaf patterns and sprigs are generated in the script below */
   --lf-back:none; --lf-liner:none; --lf-gold:none;
-  --sprig-white:none; --sprig-gold:none; --bouquet:none; --laurel:none;
+  --sprig-white:none; --sprig-gold:none; --bouquet:none;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -91,7 +93,7 @@ body.intro-active{overflow:hidden}
   background:
     var(--lf-liner) 0 0 / 150px,
     var(--lf-liner) 75px 75px / 150px,
-    #FFFFFF;
+    #F7F0E6;
 }
 
 /* — front of the envelope (closed, shown on load) — */
@@ -115,7 +117,7 @@ body.intro-active{overflow:hidden}
   position:absolute; inset:0; border-radius:4px;
   box-shadow:0 22px 44px -14px rgba(10,60,130,.5), 0 4px 10px rgba(10,60,130,.18);
 }
-.env-shell .liner{position:absolute; left:4.5%; right:4.5%; top:5%; bottom:30%; border-radius:2px}
+.env-shell .liner{position:absolute; left:4.5%; right:4.5%; top:5%; bottom:38%; border-radius:2px}
 
 .env-front{
   position:absolute; inset:0; z-index:3; border-radius:4px; overflow:hidden;
@@ -125,6 +127,16 @@ body.intro-active{overflow:hidden}
    the pocket is everything below the edge, the flap everything above it */
 .art{background:url(images/envelope-back.webp) 0 0 / var(--env-w) calc(var(--env-w) * .66) no-repeat var(--royal)}
 .env-front .pocket{position:absolute; inset:0; -webkit-clip-path:url(#pocketClip); clip-path:url(#pocketClip)}
+/* once open, the pocket and card switch to the open-envelope artwork (images/envelope-pocket.webp,
+   images/card-monogram.webp); the open flap fades away as it does not appear in that artwork */
+.env-front .pocket, .env-front .pocket-open, .flap-face{transition:opacity .6s ease}
+.env-front .pocket-open{
+  position:absolute; inset:0; opacity:0;
+  background:url(images/envelope-pocket.webp) center / 100% 100% no-repeat;
+}
+.intro.is-swapped .env-front .pocket{opacity:0}
+.intro.is-swapped .env-front .pocket-open{opacity:1}
+.intro.is-swapped .flap-face.open{opacity:0}
 
 /* top flap — shape comes from the SVG clip paths in the page */
 .flap{position:absolute; left:0; right:0; top:0; height:51.5%}
@@ -136,8 +148,8 @@ body.intro-active{overflow:hidden}
 /* iOS Safari can show a face's back side anyway, so the faces are also swapped
    by visibility exactly halfway through each flip (the flips use symmetric easing) */
 .flap-face.open{visibility:hidden}
-.intro.is-open .flap-face.outside{visibility:hidden; transition:visibility 0s linear .5s}
-.intro.is-open .flap-face.open{visibility:visible; transition:visibility 0s linear .5s}
+.intro.is-open .flap-face.outside{visibility:hidden; transition:visibility 0s linear .5s, opacity .6s ease}
+.intro.is-open .flap-face.open{visibility:visible; transition:visibility 0s linear .5s, opacity .6s ease}
 .flap-face.outside{-webkit-clip-path:url(#flapClip); clip-path:url(#flapClip)}
 .flap-face.open{ /* what shows once the flap stands up: blue with a white sprig */
   transform:rotateX(180deg);
@@ -152,7 +164,7 @@ body.intro-active{overflow:hidden}
 
 /* — the card — */
 .card{
-  position:absolute; left:6%; right:6%; bottom:5%; height:88%;
+  position:absolute; left:6%; right:6%; bottom:4%; aspect-ratio:1048 / 637;
   z-index:2; transform-style:preserve-3d;
   transition:transform 1.1s cubic-bezier(.3,.7,.3,1);
 }
@@ -168,15 +180,10 @@ body.intro-active{overflow:hidden}
 }
 .intro.is-card .card-face{box-shadow:0 24px 50px -18px rgba(10,60,130,.45), 0 2px 8px rgba(10,60,130,.12)}
 .card-face.inside{transform:rotateY(180deg) translateZ(1px)}
-.card-face.back{transform:translateZ(1px); display:grid; place-items:center}
+.card-face.back{transform:translateZ(1px)}
 
-/* back of the card: thin frame + JJ monogram */
-.card-face.back::before{
-  content:""; position:absolute; inset:6px; border:1px solid var(--gold-soft); border-radius:2px;
-  pointer-events:none;
-}
-.monogram{height:68%; aspect-ratio:1; background:var(--laurel) center / contain no-repeat}
-.monogram svg{display:block; width:100%; height:100%; overflow:visible}
+/* back of the card: the JJ monogram card from the open-envelope artwork */
+.card-face.back{background:url(images/card-monogram.webp) center / 100% 100% no-repeat #F7F0E6}
 
 /* invitation side: text on the left, gold florals bleeding off the right */
 .bouquet{
@@ -326,19 +333,12 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
       bloom(128, 118, 22, 15, col, bg) + bloom(98, 352, 24, 5, col, bg) +
       bloom(285, 395, 34, 30, col, bg) + bloom(275, 30, 28, 12, col, bg));
   }
-  function laurel(col){
-    return uri(200, 200,
-      branch(94, 172, 34, 112, -14, 6, 16, false, col) +
-      branch(106, 172, 166, 112, 14, 6, 16, false, col));
-  }
-
   var root = document.documentElement.style;
   root.setProperty('--lf-back', pattern('rgba(150,195,245,.22)'));
-  root.setProperty('--lf-liner', pattern('rgba(120,160,208,.75)'));
+  root.setProperty('--lf-liner', pattern('rgba(62,104,170,.55)'));
   root.setProperty('--sprig-white', sprig('#FFFFFF'));
   root.setProperty('--sprig-gold', sprig('#C29A57'));
   root.setProperty('--bouquet', bouquet('#C39463', '#F8EFEC'));
-  root.setProperty('--laurel', laurel('#C39463'));
 })();
 </script>
 </head>
@@ -373,17 +373,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
       <div class="env-shell royal"><div class="liner"></div></div>
 
       <div class="card" id="card">
-        <div class="card-face back">
-          <!-- JJ monogram: italic serif J interlocked with a script J, in a ring over a laurel -->
-          <div class="monogram">
-            <svg viewBox="0 0 200 200">
-              <circle cx="100" cy="92" r="66" fill="none" stroke="#C39463" stroke-width="1.2"/>
-              <circle cx="100" cy="92" r="61" fill="none" stroke="#C39463" stroke-width=".5"/>
-              <text x="88" y="122" fill="#5B6886" font-family="Cormorant Garamond" font-style="italic" font-weight="500" font-size="86" text-anchor="middle">J</text>
-              <text x="110" y="120" fill="#C39463" font-family="Pinyon Script" font-size="92" text-anchor="middle">J</text>
-            </svg>
-          </div>
-        </div>
+        <div class="card-face back"></div>
         <div class="card-face inside">
           <i class="bouquet"></i>
           <div class="card-inner">
@@ -403,6 +393,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
 
       <div class="env-front">
         <div class="pocket art"></div>
+        <div class="pocket-open"></div>
       </div>
       <div class="flap">
         <div class="flap-face outside art"></div>
@@ -446,7 +437,9 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   function at(ms, fn){ setTimeout(fn, ms); }
   function add(c){ intro.classList.add(c); }
 
-  // Card lifts just clear of the envelope, then comes to the centre and flips face up.
+  // Card rises to the half-out pose of the open-envelope artwork (bottom edge 28.4% down the
+  // envelope), then lifts just clear of it, then comes to the centre and flips face up.
+  function halfOutY(){ return -(card.offsetTop + card.offsetHeight) + card.offsetParent.offsetHeight * .284; }
   function liftY(){ return -(card.offsetTop + card.offsetHeight) - 6; }
   function finalTransform(shift){
     var env = card.offsetParent.getBoundingClientRect();
@@ -464,9 +457,11 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     at(2000, function(){ add('is-turning'); });
     at(2450, function(){ add('is-turned'); });
     at(3100, function(){ add('is-open'); });
-    at(3900, function(){ add('is-rising'); card.style.transform = 'translateY(' + liftY() + 'px)'; });
-    at(5000, function(){ add('is-lifted'); });
-    at(5100, function(){ add('is-card'); card.style.transform = finalTransform(); });
+    at(3700, function(){ add('is-swapped'); });
+    at(3900, function(){ add('is-rising'); card.style.transform = 'translateY(' + halfOutY() + 'px)'; });
+    at(5800, function(){ card.style.transform = 'translateY(' + liftY() + 'px)'; });
+    at(6700, function(){ add('is-lifted'); });
+    at(6800, function(){ add('is-card'); card.style.transform = finalTransform(); });
   }
   if (document.fonts && document.fonts.load) {
     function decoded(src){
@@ -478,7 +473,9 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
       document.fonts.load('1em Sacramento'),
       document.fonts.load('1em "Pinyon Script"'),
       decoded('images/envelope-front.webp'),
-      decoded('images/envelope-back.webp')
+      decoded('images/envelope-back.webp'),
+      decoded('images/envelope-pocket.webp'),
+      decoded('images/card-monogram.webp')
     ]).then(start, start);
     at(2500, start); // don't wait forever on a slow connection
   } else {
