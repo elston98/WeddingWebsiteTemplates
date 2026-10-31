@@ -9,7 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Sacramento&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&family=Sacramento&display=swap">
 
 <style>
 /* ══════════════════ TOKENS ══════════════════ */
@@ -17,13 +17,14 @@
   --mist:#EEF3F9; --paper:#FFFDF9;
   --royal:#145AAE; --royal-deep:#0A3C82; --royal-ink:#123A6B;
   --gold:#BF9450; --gold-dark:#A27A3C; --gold-soft:#E0C48E;
+  --blush:#F8EFEC; --slate:#5B6886; --tan:#C39463;
   --ink-soft:#4A6283;
   --serif:"Cormorant Garamond", Georgia, serif;
   --script:"Sacramento", cursive;
   --env-w:min(420px, 86vw);
   /* leaf patterns and sprigs are generated in the script below */
   --lf-front:none; --lf-back:none; --lf-liner:none; --lf-gold:none;
-  --sprig-white:none; --sprig-gold:none;
+  --sprig-white:none; --sprig-gold:none; --bouquet:none; --laurel:none;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -190,56 +191,51 @@ body.intro-active{overflow:hidden}
 .intro.is-card .card-face.inside{visibility:visible; transition:visibility 0s linear .65s}
 .card-face{
   position:absolute; inset:0; border-radius:3px; overflow:hidden;
-  background:var(--paper); -webkit-backface-visibility:hidden; backface-visibility:hidden;
+  background:var(--blush); -webkit-backface-visibility:hidden; backface-visibility:hidden;
   box-shadow:0 2px 10px rgba(10,60,130,.2);
 }
 .intro.is-card .card-face{box-shadow:0 24px 50px -18px rgba(10,60,130,.45), 0 2px 8px rgba(10,60,130,.12)}
-.card-face::before{ /* thin gold frame */
-  content:""; position:absolute; inset:6px; border:1px solid var(--gold-soft); border-radius:2px;
-  pointer-events:none; z-index:2;
-}
-.card-face.back{display:grid; place-items:center}
-.card-face.back::after{
-  content:""; position:absolute; left:50%; top:50%; width:16%; height:72%;
-  transform:translate(-50%,-50%) rotate(90deg);
-  background:var(--sprig-gold) center / contain no-repeat; opacity:.55;
-}
-.card-face.back span{
-  position:relative; z-index:1;
-  font-family:var(--script); color:var(--gold); font-size:calc(var(--env-w) * .11);
-  background:var(--paper); padding:0 .25em; border-radius:50%;
-}
 .card-face.inside{transform:rotateY(180deg) translateZ(1px)}
-.card-face.back{transform:translateZ(1px)}
-.sprig{position:absolute; width:20%; height:62%; background:var(--sprig-gold) center / contain no-repeat}
-.sprig.tr{right:3%; top:-4%; transform:rotate(-140deg)}
-.sprig.bl{left:3%; bottom:-4%; transform:rotate(40deg)}
+.card-face.back{transform:translateZ(1px); display:grid; place-items:center}
+
+/* back of the card: thin frame + JJ monogram */
+.card-face.back::before{
+  content:""; position:absolute; inset:6px; border:1px solid var(--gold-soft); border-radius:2px;
+  pointer-events:none;
+}
+.monogram{height:68%; aspect-ratio:1; background:var(--laurel) center / contain no-repeat}
+.monogram svg{display:block; width:100%; height:100%; overflow:visible}
+
+/* invitation side: text on the left, gold florals bleeding off the right */
+.bouquet{
+  position:absolute; right:-8%; top:-7%; height:114%; aspect-ratio:3 / 4;
+  background:var(--bouquet) center / contain no-repeat;
+}
 .card-inner{
-  position:relative; z-index:1; height:100%;
+  position:relative; z-index:1; height:100%; width:68%;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding:0 12%;
+  text-align:center; color:var(--slate); padding-left:3%;
 }
-.eyebrow-sm{
-  font-size:calc(var(--env-w) * .024); letter-spacing:.28em; text-transform:uppercase; color:var(--gold-dark);
+.card .caps{
+  font-size:calc(var(--env-w) * .021); letter-spacing:.16em; text-transform:uppercase; line-height:1.55;
 }
-.photo{
-  position:relative; width:calc(var(--env-w) * .13); aspect-ratio:1;
-  border-radius:50%; overflow:hidden; margin:calc(var(--env-w) * .02) 0;
-  border:2px solid var(--gold-soft);
-  box-shadow:0 0 0 3px var(--paper), 0 0 0 4px var(--gold-soft);
-  background:var(--royal);
-  display:grid; place-items:center;
+.card .nowrap{white-space:nowrap; letter-spacing:.1em}
+.card .couple{
+  font-family:var(--script); font-weight:400; white-space:nowrap;
+  font-size:calc(var(--env-w) * .1); line-height:1; margin:calc(var(--env-w) * .015) 0 calc(var(--env-w) * .02);
 }
-.photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-.photo .mono{font-family:var(--script); color:#fff; font-size:calc(var(--env-w) * .06)}
-.card h1{
-  font-family:var(--script); font-weight:400; color:var(--gold);
-  font-size:calc(var(--env-w) * .085); line-height:1.05;
+.card .couple small{font-size:.45em; margin:0 .1em}
+.when{
+  display:flex; align-items:center; gap:calc(var(--env-w) * .018);
+  margin:calc(var(--env-w) * .03) 0 calc(var(--env-w) * .026);
 }
-.card .names{
-  margin-top:calc(var(--env-w) * .012);
-  font-size:calc(var(--env-w) * .03); letter-spacing:.3em; text-transform:uppercase; color:var(--royal-ink);
+.when b{
+  font-weight:500; font-size:calc(var(--env-w) * .07); line-height:1;
+  border-left:1px solid var(--slate); padding-left:calc(var(--env-w) * .018);
 }
+.when .side{text-align:left}
+.when .side + .side{border-left:1px solid var(--slate); padding-left:calc(var(--env-w) * .018)}
+.when .side strong{font-weight:600}
 
 /* envelope drops away once the card is out */
 .intro.is-card .env-shell,
@@ -330,12 +326,48 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
   function sprig(color){
     return uri(80, 220, branch(40, 215, 44, 10, 10, 8, 42, true, color));
   }
+  // silhouette flower: petals in `col`, separated by thin lines of the paper colour `bg`
+  function bloom(cx, cy, r, rot, col, bg){
+    var s = "<g transform='rotate(" + rot + ' ' + cx + ' ' + cy + ")' fill='" + col + "' stroke='" + bg + "' stroke-width='" + (r * .05).toFixed(2) + "'>";
+    for (var i = 0; i < 8; i++)
+      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .52) + "' rx='" + r * .4 + "' ry='" + r * .55 + "' transform='rotate(" + i * 45 + ' ' + cx + ' ' + cy + ")'/>";
+    for (var j = 0; j < 5; j++)
+      s += "<ellipse cx='" + cx + "' cy='" + (cy - r * .26) + "' rx='" + r * .22 + "' ry='" + r * .3 + "' transform='rotate(" + (j * 72 + 18) + ' ' + cx + ' ' + cy + ")'/>";
+    return s + "<circle cx='" + cx + "' cy='" + cy + "' r='" + r * .14 + "'/></g>";
+  }
+  function bouquet(col, bg){
+    function sprays(){
+      return branch(165, 200, 85, 150, 14, 4, 26, false, col) +
+             branch(170, 320, 60, 335, -14, 5, 26, false, col) +
+             branch(190, 80, 90, 0, 14, 5, 26, false, col) +
+             branch(210, 250, 110, 395, 10, 5, 26, false, col) +
+             branch(240, 40, 300, -10, -8, 3, 24, false, col) +
+             branch(150, 150, 60, 60, -12, 4, 22, false, col);
+    }
+    var berries = '';
+    [[62, 248], [70, 258], [56, 262], [100, 70], [108, 60], [94, 58], [70, 390], [80, 382]].forEach(function(b){
+      berries += "<circle cx='" + b[0] + "' cy='" + b[1] + "' r='4.5' fill='" + col + "'/>";
+    });
+    return uri(300, 400, sprays() + berries +
+      bloom(215, 125, 56, 10, col, bg) + bloom(195, 300, 62, -8, col, bg) +
+      bloom(112, 228, 34, 20, col, bg) + bloom(272, 215, 30, 0, col, bg) +
+      bloom(128, 118, 22, 15, col, bg) + bloom(98, 352, 24, 5, col, bg) +
+      bloom(285, 395, 34, 30, col, bg) + bloom(275, 30, 28, 12, col, bg));
+  }
+  function laurel(col){
+    return uri(200, 200,
+      branch(94, 172, 34, 112, -14, 6, 16, false, col) +
+      branch(106, 172, 166, 112, 14, 6, 16, false, col));
+  }
+
   var root = document.documentElement.style;
   root.setProperty('--lf-front', pattern('rgba(4,32,84,.35)'));
   root.setProperty('--lf-back', pattern('rgba(150,195,245,.22)'));
   root.setProperty('--lf-liner', pattern('rgba(120,160,208,.75)'));
   root.setProperty('--sprig-white', sprig('#FFFFFF'));
   root.setProperty('--sprig-gold', sprig('#C29A57'));
+  root.setProperty('--bouquet', bouquet('#C39463', '#F8EFEC'));
+  root.setProperty('--laurel', laurel('#C39463'));
 })();
 </script>
 </head>
@@ -368,18 +400,30 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
       <div class="env-shell royal"><div class="liner"></div></div>
 
       <div class="card" id="card">
-        <div class="card-face back"><span>J&amp;J</span></div>
+        <div class="card-face back">
+          <!-- JJ monogram: italic serif J interlocked with a script J, in a ring over a laurel -->
+          <div class="monogram">
+            <svg viewBox="0 0 200 200">
+              <circle cx="100" cy="92" r="66" fill="none" stroke="#C39463" stroke-width="1.2"/>
+              <circle cx="100" cy="92" r="61" fill="none" stroke="#C39463" stroke-width=".5"/>
+              <text x="88" y="122" fill="#5B6886" font-family="Cormorant Garamond" font-style="italic" font-weight="500" font-size="86" text-anchor="middle">J</text>
+              <text x="110" y="120" fill="#C39463" font-family="Pinyon Script" font-size="92" text-anchor="middle">J</text>
+            </svg>
+          </div>
+        </div>
         <div class="card-face inside">
-          <i class="sprig tr"></i><i class="sprig bl"></i>
+          <i class="bouquet"></i>
           <div class="card-inner">
-            <p class="eyebrow-sm">Together with their families</p>
-            <div class="photo">
-              <span class="mono">J&amp;J</span>
-              <!-- Drop the couple's photo at photos/couple.jpg; the monogram shows until then -->
-              <img src="photos/couple.jpg" alt="" onerror="this.remove()">
+            <p class="caps">Together with their families</p>
+            <h1 class="couple">John <small>and</small> Jess</h1>
+            <p class="caps nowrap">invite you to their wedding celebration</p>
+            <!-- Placeholder date, time and venue: replace once confirmed -->
+            <div class="when caps">
+              <b>DD</b>
+              <span class="side"><strong>Month</strong><br>Year</span>
+              <span class="side"><strong>Day</strong><br>at time</span>
             </div>
-            <h1>We&rsquo;re getting married!</h1>
-            <p class="names">John &amp; Jess</p>
+            <p class="caps">Venue name<br>Address line<br>City, State</p>
           </div>
         </div>
       </div>
@@ -455,7 +499,7 @@ body.intro-active .hero > *{opacity:0; transform:translateY(12px)}
     at(5100, function(){ add('is-card'); card.style.transform = finalTransform(); });
   }
   if (document.fonts && document.fonts.load) {
-    document.fonts.load('1em Sacramento').then(start, start);
+    Promise.all([document.fonts.load('1em Sacramento'), document.fonts.load('1em "Pinyon Script"')]).then(start, start);
     at(1500, start); // don't wait forever on a slow connection
   } else {
     start();
